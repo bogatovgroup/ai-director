@@ -1,0 +1,44 @@
+:root{--bg:#050008;--bg2:#0c0612;--fg:#fff;--ac:#a78bfa;--ac-b:#c4b5fd;--ac-d:#7c3aed;--line:rgba(167,139,250,.18);--card:rgba(167,139,250,.06);--mut:rgba(255,255,255,.65);
+--disp:"Orbitron","Inter",system-ui,sans-serif;--sans:"Inter",-apple-system,"Segoe UI",system-ui,sans-serif}
+html,body{overflow-x:hidden}
+*{box-sizing:border-box;margin:0}html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--sans);background-image:radial-gradient(#a78bfa14 1px,transparent 1px);background-size:28px 28px}
+a{color:inherit}.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+section{padding:72px 0;position:relative}
+h1,h2,h3{font-family:var(--disp);letter-spacing:-.02em;line-height:1.12}
+h1{font-weight:900;font-size:clamp(40px,8vw,104px);letter-spacing:-.04em;line-height:.9}
+h2{font-weight:700;font-size:clamp(26px,3.4vw,44px);margin-bottom:32px}
+h3{font-weight:600;font-size:20px}
+.grad{background:linear-gradient(135deg,var(--ac-b),var(--ac) 50%,var(--ac-d));-webkit-background-clip:text;background-clip:text;color:transparent}
+.glow:before{content:"";position:absolute;width:700px;height:700px;left:50%;top:-200px;transform:translateX(-50%);background:radial-gradient(circle,#7c3aed2e,#7c3aed00 70%);pointer-events:none}
+header{position:sticky;top:0;z-index:50;background:rgba(5,0,8,.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-family:var(--disp);font-weight:900;text-decoration:none}nav a{margin-left:22px;text-decoration:none;color:var(--mut);font-size:14px}nav a:hover{color:var(--ac-b)}
+.btn{display:inline-block;border:0;cursor:pointer;font:600 16px var(--sans);color:#fff;text-decoration:none;padding:15px 30px;border-radius:12px;background:linear-gradient(135deg,var(--ac),var(--ac-d));box-shadow:0 0 30px #7c3aed55;transition:.2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 0 44px #7c3aed99}
+.btn.ghost{background:transparent;border:1px solid var(--ac);box-shadow:none}
+.tag{display:inline-block;border:1px solid var(--line);color:var(--ac-b);border-radius:99px;padding:4px 14px;font-size:13px;margin-bottom:20px}
+.sub{font-family:var(--disp);font-weight:600;font-size:clamp(18px,2.2vw,27px);color:#ffffffe6;max-width:760px;margin:24px 0 32px}
+.grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
+.card .n{font-family:var(--disp);font-weight:900;color:var(--ac);font-size:28px}
+.card ul{padding-left:18px;color:var(--mut);margin-top:10px}.card p{color:var(--mut);margin-top:8px}
+.stat{font-family:var(--disp);font-weight:900;font-size:44px}
+.ph{border:1px dashed var(--ac);color:var(--ac-b);border-radius:12px;padding:14px;text-align:center;font-size:14px;margin-top:12px}
+.img{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;background:var(--bg2)}
+details{border:1px solid var(--line);border-radius:14px;margin-bottom:12px;background:var(--card)}
+summary{cursor:pointer;padding:18px 22px;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:12px}
+summary:after{content:"+";color:var(--ac);font-size:22px}details[open] summary:after{content:"–"}
+details>div{padding:0 22px 20px;color:var(--mut)}
+.badge{font-size:12px;color:var(--ac-b);border:1px solid var(--line);border-radius:99px;padding:2px 10px;margin-left:8px}
+.steps{counter-reset:s}.steps .card:before{counter-increment:s;content:"0" counter(s);font-family:var(--disp);font-weight:900;color:var(--ac);font-size:28px;display:block}
+.price{font-family:var(--disp);font-size:32px;font-weight:700;margin:10px 0}
+.hot{border-color:var(--ac);box-shadow:0 0 40px #7c3aed40}
+dialog{margin:auto;background:var(--bg2);color:#fff;border:1px solid var(--ac);border-radius:18px;padding:32px;width:min(440px,92vw)}
+dialog::backdrop{background:rgba(0,0,0,.7);backdrop-filter:blur(4px)}
+form input[type=text],form input[type=tel]{width:100%;padding:14px;margin:8px 0;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:#fff;font:inherit}
+form label.c{display:flex;gap:8px;font-size:13px;color:var(--mut);margin:10px 0 16px}
+.x{float:right;background:none;border:0;color:#fff;font-size:26px;cursor:pointer}
+.msg{margin-top:12px;font-size:14px;color:var(--ac-b)}
+footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mut);font-size:14px}footer a{margin-right:18px}
+@media(max-width:720px){nav{display:none}section{padding:48px 0}}
