@@ -64,3 +64,9 @@ footer:before{content:"";position:absolute;width:600px;height:600px;left:-150px;
 footer a{margin-right:0;text-decoration:none}
 .f-bottom{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:36px;padding-top:20px;font-size:13px;position:relative}
 @media(max-width:900px){.f-grid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.f-grid{grid-template-columns:1fr}}
+.f-eco{margin-top:40px;padding:28px;border-radius:18px;background:linear-gradient(135deg,#2a0f55,#14062a);border:1px solid var(--line);position:relative}
+.f-eco h3{font-size:clamp(18px,2.4vw,26px);text-transform:uppercase;font-weight:700;margin-bottom:18px}
+.f-sk{display:flex;align-items:center;gap:16px;margin-bottom:22px}.f-sk p{max-width:340px;font-size:15px;color:#ffffffd9;line-height:1.35}
+.sk-logo{font-family:var(--sans);font-weight:800;font-size:38px;line-height:1;letter-spacing:-.04em}
+.f-soc{display:flex;gap:14px}.f-soc a{width:52px;height:52px;border-radius:50%;background:#fff;color:#1a0a33;display:flex;align-items:center;justify-content:center;transition:.2s}
+.f-soc a:hover{transform:translateY(-3px);background:var(--ac-b);color:#1a0a33}.f-soc svg{width:26px;height:26px}
