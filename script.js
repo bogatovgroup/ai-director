@@ -1,4 +1,4 @@
-// Приём заявок. Если задан вебхук Битрикс24 (crm.lead.add) — заявка уходит в CRM,
+// Приём заявок. Если задан вебхук Битрикс24 (crm.lead.add) – заявка уходит в CRM,
 // иначе открывается письмо на info@ai-corp.by (mailto). Секреты в публичный репозиторий не коммитить.
 const BITRIX_WEBHOOK = "";
 const MAIL = "info@ai-corp.by";
@@ -10,10 +10,10 @@ document.querySelector("form.lead-form").addEventListener("submit", async e => {
   e.preventDefault();
   const f = e.target, m = f.querySelector(".msg"), d = Object.fromEntries(new FormData(f)), q = new URLSearchParams(location.search);
   const text = ["Имя: " + d.name, "Email: " + d.email, "Контакт: " + d.contact, "Формат: " + d.format,
-    "Заявка для: " + d.who + (d.company ? " (" + d.company + ")" : ""), "Комментарий: " + (d.comment || "—")].join("\n");
+    "Заявка для: " + d.who + (d.company ? " (" + d.company + ")" : ""), "Комментарий: " + (d.comment || "–")].join("\n");
   if (!BITRIX_WEBHOOK) {
     location.href = "mailto:" + MAIL + "?subject=" + encodeURIComponent("Заявка: Директор по внедрению ИИ") + "&body=" + encodeURIComponent(text);
-    m.textContent = "Открылось письмо в вашей почтовой программе — отправьте его. Если не открылось, напишите на " + MAIL + ".";
+    m.textContent = "Открылось письмо в вашей почтовой программе – отправьте его. Если не открылось, напишите на " + MAIL + ".";
     return;
   }
   const fields = { TITLE: "Заявка с сайта: Директор по внедрению ИИ", NAME: d.name, EMAIL: [{ VALUE: d.email, VALUE_TYPE: "WORK" }],
@@ -31,8 +31,8 @@ quiz.addEventListener("change", () => {
   const ans = [0, 1, 2, 3, 4].map(i => quiz.querySelector("input[name=q" + i + "]:checked"));
   if (ans.some(a => !a)) { verdict.style.display = "none"; return; }
   const n = ans.filter(a => a.value === "1").length;
-  verdict.innerHTML = n <= 1 ? "<strong>0–1 «да» — доработка.</strong> Опишите, какие данные нужно подготовить, и повторите оценку."
-    : n <= 3 ? "<strong>2–3 «да» — условный допуск.</strong> Запишите условия: что сделать, кто отвечает, к какому сроку. Условный допуск без записанных условий, ответственных и сроков не является условным допуском."
-    : "<strong>4–5 «да» — предварительный допуск по данным.</strong> Это не разрешение на запуск проекта: право использования данных, безопасность и экономика проверяются отдельно.";
+  verdict.innerHTML = n <= 1 ? "<strong>0–1 «да» – доработка.</strong> Опишите, какие данные нужно подготовить, и повторите оценку."
+    : n <= 3 ? "<strong>2–3 «да» – условный допуск.</strong> Запишите условия: что сделать, кто отвечает, к какому сроку. Условный допуск без записанных условий, ответственных и сроков не является условным допуском."
+    : "<strong>4–5 «да» – предварительный допуск по данным.</strong> Это не разрешение на запуск проекта: право использования данных, безопасность и экономика проверяются отдельно.";
   verdict.style.display = "block";
 });
