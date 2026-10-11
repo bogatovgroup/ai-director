@@ -54,3 +54,13 @@ form.lead-form label.f{display:block;font-size:13px;color:var(--mut);margin-top:
 select,textarea{width:100%;padding:14px;margin:6px 0;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:#fff;font:inherit}
 form input[type=email]{width:100%;padding:14px;margin:6px 0;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:#fff;font:inherit}
 .c a{color:var(--ac-b)}
+footer{background:linear-gradient(180deg,transparent,#0c0612 40%);border-top:1px solid var(--line);padding:56px 0 28px;margin-top:24px;position:relative;overflow:hidden}
+footer:before{content:"";position:absolute;width:600px;height:600px;left:-150px;bottom:-350px;background:radial-gradient(circle,#7c3aed2e,#7c3aed00 70%);pointer-events:none}
+.f-grid{display:grid;gap:36px;grid-template-columns:1.1fr .8fr 1.2fr 1.4fr;position:relative}
+.f-col h4{font-family:var(--disp);font-size:14px;font-weight:700;color:var(--ac-b);margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em}
+.f-col p{font-size:14px;line-height:1.55;margin-bottom:12px}.f-col strong{color:#fff}.f-col span{color:var(--ac-b)}
+.f-logo{font-size:26px;display:inline-block}.f-tag{margin:10px 0 18px}
+.f-nav{display:flex;flex-direction:column;gap:10px}.f-nav a{margin:0;text-decoration:none;color:var(--mut);font-size:14px}.f-nav a:hover,footer a:hover{color:var(--ac-b)}
+footer a{margin-right:0;text-decoration:none}
+.f-bottom{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:36px;padding-top:20px;font-size:13px;position:relative}
+@media(max-width:900px){.f-grid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.f-grid{grid-template-columns:1fr}}
