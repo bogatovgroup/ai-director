@@ -70,7 +70,7 @@ footer a{margin-right:0;text-decoration:none}
 .sk-logo{font-family:var(--sans);font-weight:800;font-size:38px;line-height:1;letter-spacing:-.04em}
 .f-soc{display:flex;gap:14px}.f-soc a{width:52px;height:52px;border-radius:50%;background:#fff;color:#1a0a33;display:flex;align-items:center;justify-content:center;transition:.2s}
 .f-soc a:hover{transform:translateY(-3px);background:var(--ac-b);color:#1a0a33}.f-soc svg{width:26px;height:26px}
-footer .f-col .f-soc{margin-top:36px}
+footer .f-col .f-soc{margin:0 0 28px}
 .warn{margin-top:20px;padding:12px 18px;border:1px solid var(--ac);border-radius:12px;background:rgba(124,58,237,.14);color:#fff;font-size:15px;max-width:760px}
 .grid.two{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
 .card ul li{margin-bottom:6px}
