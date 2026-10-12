@@ -76,3 +76,7 @@ footer .f-col .f-soc{margin:0 0 28px}
 .card ul li{margin-bottom:6px}
 .ph.tall{min-height:180px;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:700;font-size:18px;margin-bottom:14px}
 .badge.ok{border-color:#12B886;color:#6ee7b7}.badge{white-space:nowrap}
+#tariffs .card{display:flex;flex-direction:column}
+#tariffs .card br{display:none}
+#tariffs .card ul{margin-bottom:24px}
+#tariffs .card .btn{margin-top:auto;align-self:flex-start}
