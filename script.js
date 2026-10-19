@@ -10,7 +10,9 @@ document.querySelector("form.lead-form").addEventListener("submit", async e => {
   e.preventDefault();
   const f = e.target, m = f.querySelector(".msg"), d = Object.fromEntries(new FormData(f)), q = new URLSearchParams(location.search);
   const text = ["Имя: " + d.name, "Email: " + d.email, "Контакт: " + d.contact, "Формат: " + d.format,
-    "Заявка для: " + d.who + (d.company ? " (" + d.company + ")" : ""), "Комментарий: " + (d.comment || "-")].join("\n");
+    "Заявка для: " + d.who + (d.company ? " (" + d.company + ")" : ""), "Комментарий: " + (d.comment || "-"),
+    "Согласие на обработку ПДн: да (" + new Date().toISOString() + ", согласие ред. 1.0 от 19.10.2026)",
+    "Согласие на рассылки: " + (d.mailing ? "да" : "нет")].join("\n");
   if (!BITRIX_WEBHOOK) {
     location.href = "mailto:" + MAIL + "?subject=" + encodeURIComponent("Заявка: Директор по внедрению ИИ") + "&body=" + encodeURIComponent(text);
     m.textContent = "Открылось письмо в вашей почтовой программе - отправьте его. Если не открылось, напишите на " + MAIL + ".";
@@ -36,3 +38,21 @@ quiz.addEventListener("change", () => {
     : "<strong>4-5 «да» - предварительный допуск по данным.</strong> Это не разрешение на запуск проекта: право использования данных, безопасность и экономика проверяются отдельно.";
   verdict.style.display = "block";
 });
+
+// Баннер cookies: аналитика подключается только после согласия
+function loadAnalytics() { /* сюда добавить код счётчика (Метрика и т.п.) после выбора сервиса */ }
+(function () {
+  var KEY = "aicorp_cookie", b = document.getElementById("cookie"), v = null;
+  try { v = localStorage.getItem(KEY); } catch (e) {}
+  if (v === "all") { loadAnalytics(); return; }
+  if (v || !b) return;
+  b.style.display = "flex";
+  b.querySelectorAll("[data-c]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var c = btn.getAttribute("data-c");
+      try { localStorage.setItem(KEY, c); } catch (e) {}
+      b.style.display = "none";
+      if (c === "all") loadAnalytics();
+    });
+  });
+})();
