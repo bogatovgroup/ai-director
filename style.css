@@ -111,6 +111,6 @@ footer .f-col .f-soc{margin:0 0 28px}
 .hero h1{font-size:clamp(40px,7vw,88px)}
 @media(max-width:900px){.hero-planet{position:relative;right:auto;top:auto;width:min(340px,80vw);margin:0 auto -20px}}
 .av{background-repeat:no-repeat;color:transparent;border:2px solid var(--ac);overflow:hidden}
-.av-mp{background-image:url(img/speakers/petrushkevich.jpg),linear-gradient(135deg,var(--ac),var(--ac-d));background-size:177px auto,cover;background-position:-49px -19px,0 0}
-.av-ap{background-image:url(img/speakers/pan.jpg),linear-gradient(135deg,var(--ac),var(--ac-d));background-size:219px auto,cover;background-position:-60px -7px,0 0}
-.av-sk{background-image:url(img/speakers/kuryan.jpg),linear-gradient(135deg,var(--ac),var(--ac-d));background-size:205px auto,cover;background-position:-68px -5px,0 0}
+.av-mp{background-image:url(img/speakers/petrushkevich.jpg),linear-gradient(135deg,var(--ac),var(--ac-d));background-size:89px auto,cover;background-position:-9px 0,0 0}
+.av-ap{background-image:url(img/speakers/pan.jpg),linear-gradient(135deg,var(--ac),var(--ac-d));background-size:110px auto,cover;background-position:-14px 0,0 0}
+.av-sk{background-image:url(img/speakers/kuryan.jpg),linear-gradient(135deg,var(--ac),var(--ac-d));background-size:103px auto,cover;background-position:-18px 0,0 0}
