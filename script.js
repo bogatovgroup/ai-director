@@ -56,3 +56,17 @@ function loadAnalytics() { /* сюда добавить код счётчика 
     });
   });
 })();
+
+// Спикеры: стрелки прокрутки
+(function () {
+  var sc = document.getElementById("sp");
+  if (!sc) return;
+  document.querySelectorAll("[data-sc]").forEach(function (b) {
+    b.addEventListener("click", function () { sc.scrollBy({ left: Number(b.getAttribute("data-sc")) * 380, behavior: "smooth" }); });
+  });
+})();
+
+// Вакансии HeadHunter: пока заглушка.
+// Позже: запрос на свой серверный прокси к https://api.hh.ru/vacancies?text=... (нужен заголовок User-Agent и токен приложения),
+// ответ кэшировать на сервере, на странице выводить карточки: название, компания, зарплата, ссылка на вакансию.
+function loadVacancies() { /* TODO: fetch("/api/vacancies") и отрисовка в #hh-vacancies */ }
