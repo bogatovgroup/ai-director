@@ -103,3 +103,4 @@ footer .f-col .f-soc{margin:0 0 28px}
 .back.nophoto img{display:none}.back.nophoto .ph-miss{display:flex}
 .author-grid{display:grid;gap:32px;grid-template-columns:1fr;align-items:start}.flip-wrap .flip{max-width:360px}
 @media(min-width:900px){.author-grid{grid-template-columns:1fr 360px}}
+.back img[src*="kuryan"]{object-position:50% 25%}
