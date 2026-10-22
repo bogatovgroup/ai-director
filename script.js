@@ -70,3 +70,9 @@ function loadAnalytics() { /* сюда добавить код счётчика 
 // Позже: запрос на свой серверный прокси к https://api.hh.ru/vacancies?text=... (нужен заголовок User-Agent и токен приложения),
 // ответ кэшировать на сервере, на странице выводить карточки: название, компания, зарплата, ссылка на вакансию.
 function loadVacancies() { /* TODO: fetch("/api/vacancies") и отрисовка в #hh-vacancies */ }
+
+// Карточки спикеров: переворот по клику / Enter / пробелу
+document.addEventListener("click", function (e) { var c = e.target.closest(".flip"); if (c) c.classList.toggle("is-flipped"); });
+document.addEventListener("keydown", function (e) {
+  if ((e.key === "Enter" || e.key === " ") && e.target.classList && e.target.classList.contains("flip")) { e.preventDefault(); e.target.classList.toggle("is-flipped"); }
+});

@@ -92,3 +92,14 @@ footer .f-col .f-soc{margin:0 0 28px}
 .scroller{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:14px;scrollbar-width:thin;scrollbar-color:var(--ac) transparent}
 .sp{flex:0 0 min(360px,86%);scroll-snap-align:start}.av{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac-d));display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:900;font-size:20px;margin-bottom:14px}
 .role{color:var(--ac-b)!important;font-weight:500;margin:4px 0 10px!important}
+.flip{perspective:1200px;cursor:pointer;outline-offset:4px}.flip-in{display:grid;transition:transform .7s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d;height:100%}
+.flip.is-flipped .flip-in{transform:rotateY(180deg)}
+.face{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:16px}
+.flip .front{min-height:440px;display:flex;flex-direction:column}.flip .front .hint{margin-top:auto;padding-top:14px;font-size:12px;color:var(--ac)}
+.back{transform:rotateY(180deg);position:relative;overflow:hidden;background:var(--bg2);border:1px solid var(--ac);min-height:440px}
+.back img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top}
+.back .cap{position:absolute;left:0;right:0;bottom:0;padding:34px 18px 16px;background:linear-gradient(transparent,rgba(5,0,8,.85));font-family:var(--disp);font-weight:700}
+.back .ph-miss{display:none;position:absolute;inset:0;align-items:center;justify-content:center;color:var(--ac-b);font-size:14px;text-align:center;padding:20px}
+.back.nophoto img{display:none}.back.nophoto .ph-miss{display:flex}
+.author-grid{display:grid;gap:32px;grid-template-columns:1fr;align-items:start}.flip-wrap .flip{max-width:360px}
+@media(min-width:900px){.author-grid{grid-template-columns:1fr 360px}}
