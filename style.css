@@ -148,3 +148,6 @@ a.vac-card:hover{border-color:var(--ac);transform:translateY(-3px);box-shadow:0 
 @media(prefers-reduced-motion:reduce){.vac-track{animation:none}.vac-wrap{overflow-x:auto}}
 .hh-widget{max-width:100%;overflow-x:auto;min-height:178px;display:flex;justify-content:center}
 .f-btnwrap .f-res img{width:0;min-width:50%}
+.hh-widget{justify-content:flex-start}
+.hh-widget{display:block;overflow-x:auto;overflow-y:hidden;min-height:0}
+.hh-scale{width:1260px;transform-origin:left top}

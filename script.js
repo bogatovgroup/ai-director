@@ -188,3 +188,22 @@ document.addEventListener("keydown", function (e) {
   if ("IntersectionObserver" in window) new IntersectionObserver(function (e) { visible = e[0].isIntersecting; visible ? start() : stop(); }).observe(cv);
   resize(); frame(0); start();
 })();
+
+// Виджет вакансий HeadHunter: масштабируем под ширину блока, чтобы 4 карточки помещались без прокрутки
+(function () {
+  var box = document.querySelector(".hh-widget"), inner = box && box.querySelector(".hh-scale");
+  if (!box || !inner) return;
+  var W = 1260, H = 178;
+  function fit() {
+    var avail = box.clientWidth;
+    if (avail >= 900) {
+      var k = Math.min(1, avail / W);
+      inner.style.transform = "scale(" + k + ")";
+      box.style.height = Math.round(H * k) + "px";
+      box.style.overflowX = "hidden";
+    } else {
+      inner.style.transform = ""; box.style.height = ""; box.style.overflowX = "auto";
+    }
+  }
+  fit(); window.addEventListener("resize", fit);
+})();
