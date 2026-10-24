@@ -114,3 +114,8 @@ footer .f-col .f-soc{margin:0 0 28px}
 .av-mp{background-image:url(img/speakers/petrushkevich.jpg),linear-gradient(135deg,var(--ac),var(--ac-d));background-size:89px auto,cover;background-position:-9px 0,0 0}
 .av-ap{background-image:url(img/speakers/pan.jpg),linear-gradient(135deg,var(--ac),var(--ac-d));background-size:110px auto,cover;background-position:-14px 0,0 0}
 .av-sk{background-image:url(img/speakers/kuryan.jpg),linear-gradient(135deg,var(--ac),var(--ac-d));background-size:103px auto,cover;background-position:-18px 0,0 0}
+.amb-card{flex:0 0 min(300px,80%);aspect-ratio:1;scroll-snap-align:start;border-radius:16px;position:relative;overflow:hidden;border:1px solid var(--ac);background:var(--bg2);display:block;text-decoration:none}
+.amb-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 18%}
+.amb-card .cap{position:absolute;left:0;right:0;bottom:0;padding:34px 16px 14px;background:linear-gradient(transparent,rgba(5,0,8,.88));font-family:var(--disp);font-weight:700;font-size:16px}
+.amb-empty{border:2px dashed var(--ac);background:var(--card);display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--ac-b);font-family:var(--disp);font-weight:700;font-size:18px;transition:.2s}
+.amb-empty:hover{background:rgba(124,58,237,.18);color:#fff}

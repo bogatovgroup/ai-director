@@ -59,9 +59,9 @@ function loadAnalytics() { /* сюда добавить код счётчика 
 
 // Спикеры: стрелки прокрутки
 (function () {
-  var sc = document.getElementById("sp");
-  if (!sc) return;
   document.querySelectorAll("[data-sc]").forEach(function (b) {
+    var sc = document.getElementById(b.getAttribute("data-for") || "sp");
+    if (!sc) return;
     b.addEventListener("click", function () { sc.scrollBy({ left: Number(b.getAttribute("data-sc")) * 380, behavior: "smooth" }); });
   });
 })();
