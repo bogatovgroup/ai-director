@@ -132,3 +132,6 @@ footer .f-col .f-soc{margin:0 0 28px}
 .f-btnwrap .f-res{margin-top:22px;display:block}.f-btnwrap .f-res img{width:100%;height:auto}
 .f-btnwrap{display:grid;width:max-content;max-width:100%}.f-btnwrap .f-res img{width:0;min-width:100%}
 .f-btnwrap .f-tag{white-space:nowrap;margin:10px 0 18px}
+.prob-grid{display:grid;gap:36px;grid-template-columns:1fr;align-items:start}
+.prob-video{max-width:320px;width:100%;margin:0 auto}.prob-video video{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:18px;border:1px solid var(--ac);background:#000;box-shadow:0 0 40px #7c3aed40;display:block}
+@media(min-width:900px){.prob-grid{grid-template-columns:320px 1fr}.prob-video{margin:0}}
