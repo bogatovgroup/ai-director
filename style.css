@@ -130,3 +130,4 @@ footer .f-col .f-soc{margin:0 0 28px}
 @media(max-width:900px){header nav{display:none}}
 .f-btnwrap{display:inline-block}.f-btnwrap .btn{display:block;text-align:center}
 .f-btnwrap .f-res{margin-top:22px;display:block}.f-btnwrap .f-res img{width:100%;height:auto}
+.f-btnwrap{display:grid;width:max-content;max-width:100%}.f-btnwrap .f-res img{width:0;min-width:100%}
