@@ -193,3 +193,5 @@ a.vac-card:hover{border-color:var(--ac);transform:translateY(-3px);box-shadow:0 
 [data-theme="light"] .vac-card,[data-theme="light"] .doc-card{color:var(--fg)}
 [data-theme="light"] .verdict{background:#fff}
 [data-theme="light"] .hero-planet{filter:none}
+/* Переключатель темы скрыт: сайт всегда тёмный. Чтобы вернуть, удалите это правило и включите THEME_SWITCH в theme.js */
+.theme-toggle{display:none}
