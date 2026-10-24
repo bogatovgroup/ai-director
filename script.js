@@ -150,10 +150,11 @@ document.addEventListener("keydown", function (e) {
 
   function frame(time) {
     var ang = 0.5 + time * 0.00012, c = Math.cos(ang), s = Math.sin(ang), cx = S / 2, cy = S / 2, k;
+    var light = document.documentElement.getAttribute("data-theme") === "light";
     ctx.clearRect(0, 0, S, S);
     for (k = 0; k < stars.length; k++) {
       var st = stars[k], tw = 0.15 + 0.2 * Math.sin(time * 0.0012 + st.ph);
-      ctx.fillStyle = "rgba(220,215,255," + tw + ")"; ctx.fillRect(cx + st.x * S * 0.48, cy + st.y * S * 0.48, 1.2 * K + 0.3, 1.2 * K + 0.3);
+      ctx.fillStyle = light ? "rgba(91,33,182," + tw + ")" : "rgba(220,215,255," + tw + ")"; ctx.fillRect(cx + st.x * S * 0.48, cy + st.y * S * 0.48, 1.2 * K + 0.3, 1.2 * K + 0.3);
     }
     for (k = 0; k < LV; k++) bc[k] = 0;
     for (i = 0; i < M; i++) {
@@ -170,12 +171,12 @@ document.addEventListener("keydown", function (e) {
     var d = 1.35 * K + 0.25;
     for (k = 0; k < LV; k++) {
       var t = k / (LV - 1), arr = buckets[k], cnt = bc[k], j;
-      ctx.fillStyle = "rgba(" + Math.round(205 + 50 * t) + "," + Math.round(198 + 57 * t) + ",255," + (0.12 + 0.88 * t) + ")";
+      ctx.fillStyle = light ? "rgba(" + Math.round(110 - 40 * t) + "," + Math.round(70 - 30 * t) + ",215," + (0.18 + 0.82 * t) + ")" : "rgba(" + Math.round(205 + 50 * t) + "," + Math.round(198 + 57 * t) + ",255," + (0.12 + 0.88 * t) + ")";
       for (j = 0; j < cnt; j += 2) ctx.fillRect(arr[j] - d / 2, arr[j + 1] - d / 2, d, d);
     }
     // лёгкая атмосфера по краю
     var rg = ctx.createRadialGradient(cx, cy, R * 0.96, cx, cy, R * 1.07);
-    rg.addColorStop(0, "rgba(180,165,255,0)"); rg.addColorStop(0.55, "rgba(180,165,255,.13)"); rg.addColorStop(1, "rgba(180,165,255,0)");
+    var rc = light ? "91,33,182" : "180,165,255"; rg.addColorStop(0, "rgba(" + rc + ",0)"); rg.addColorStop(0.55, "rgba(" + rc + ",.13)"); rg.addColorStop(1, "rgba(" + rc + ",0)");
     ctx.fillStyle = rg; ctx.beginPath(); ctx.arc(cx, cy, R * 1.07, 0, 6.283); ctx.fill();
   }
 
