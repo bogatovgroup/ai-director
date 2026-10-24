@@ -121,5 +121,10 @@ footer .f-col .f-soc{margin:0 0 28px}
 .amb-empty:hover{background:rgba(124,58,237,.18);color:#fff}
 .amb-card{flex:0 0 min(360px,86%);aspect-ratio:auto;min-height:440px}
 .amb-card img{object-position:center 12%}
-.f-res{display:flex;align-items:center;gap:14px;margin-top:26px}.f-res img{width:64px;height:auto;display:block}
+.f-res{display:flex;align-items:center;gap:14px;margin-top:26px}.f-res img{width:32px;height:auto;display:block}
 .f-res span{font-size:14px;font-weight:600;line-height:1.3;color:#fff;max-width:120px}
+.doc-card{display:flex;flex-direction:column;text-decoration:none;color:inherit;transition:.2s}.doc-card:hover{border-color:var(--ac);transform:translateY(-3px);box-shadow:0 0 30px #7c3aed40}
+.doc-card .doc-go{margin-top:auto;padding-top:14px;color:var(--ac-b);font-weight:600;font-size:14px}
+.logo,header nav a{white-space:nowrap}
+@media(max-width:1100px){header nav a{margin-left:14px;font-size:13px}}
+@media(max-width:900px){header nav{display:none}}
