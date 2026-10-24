@@ -136,3 +136,13 @@ footer .f-col .f-soc{margin:0 0 28px}
 .prob-video{max-width:320px;width:100%;margin:0 auto}.prob-video video{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:18px;border:1px solid var(--ac);background:#000;box-shadow:0 0 40px #7c3aed40;display:block}
 @media(min-width:900px){.prob-grid{grid-template-columns:320px 1fr}.prob-video{margin:0}}
 .hero-cta{width:320px;max-width:100%;text-align:center}
+.vac-wrap{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+.vac-track{display:flex;width:max-content;animation:vac-scroll var(--dur,50s) linear infinite}
+.vac-wrap:hover .vac-track,.vac-wrap:focus-within .vac-track{animation-play-state:paused}
+@keyframes vac-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.vac-card{flex:0 0 300px;margin-right:18px;min-height:200px;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;color:inherit;text-decoration:none;transition:.2s}
+a.vac-card:hover{border-color:var(--ac);transform:translateY(-3px);box-shadow:0 0 30px #7c3aed40}
+.vac-card h3{font-size:17px;line-height:1.25;margin-bottom:8px}.vac-co{color:var(--ac-b);font-weight:600;font-size:14px;margin-bottom:6px}.vac-sal{font-weight:600;margin-bottom:6px}.vac-meta{color:var(--mut);font-size:13px}
+.vac-go{margin-top:auto;padding-top:12px;color:var(--ac);font-size:13px;font-weight:600}
+.vac-demo{justify-content:center}.vac-demo .ph{margin:0;min-height:150px;width:100%}
+@media(prefers-reduced-motion:reduce){.vac-track{animation:none}.vac-wrap{overflow-x:auto}}

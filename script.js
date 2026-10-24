@@ -66,10 +66,44 @@ function loadAnalytics() { /* сюда добавить код счётчика 
   });
 })();
 
-// Вакансии HeadHunter: пока заглушка.
-// Позже: запрос на свой серверный прокси к https://api.hh.ru/vacancies?text=... (нужен заголовок User-Agent и токен приложения),
-// ответ кэшировать на сервере, на странице выводить карточки: название, компания, зарплата, ссылка на вакансию.
-function loadVacancies() { /* TODO: fetch("/api/vacancies") и отрисовка в #hh-vacancies */ }
+// Вакансии HeadHunter: бегущая лента карточек (справа налево). Данные приходят с вашего сервера (api/vacancies.php),
+// который обращается к API hh.ru с токеном. Пока сервера нет, лента показывает заглушки.
+var VAC_URL = "api/vacancies.php";
+var VAC_REFRESH_MS = 10 * 60 * 1000;
+
+function vacEsc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+function vacSalary(s) {
+  if (!s || (!s.from && !s.to)) return "Зарплата не указана";
+  var cur = { RUR: "₽", RUB: "₽", USD: "$", EUR: "€", KZT: "₸", BYR: "Br", BYN: "Br" }[s.currency] || (s.currency || "");
+  var f = function (n) { return Number(n).toLocaleString("ru-RU"); };
+  return (s.from ? "от " + f(s.from) + " " : "") + (s.to ? "до " + f(s.to) + " " : "") + cur;
+}
+function vacDate(iso) {
+  var d = new Date(iso); if (isNaN(d)) return "";
+  return d.toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
+}
+function vacCard(v) {
+  return '<a class="vac-card" href="' + vacEsc(v.url) + '" target="_blank" rel="noopener nofollow">' +
+    '<h3>' + vacEsc(v.name) + '</h3><p class="vac-co">' + vacEsc(v.employer) + '</p><p class="vac-sal">' + vacEsc(vacSalary(v.salary)) + '</p>' +
+    '<p class="vac-meta">' + vacEsc(v.area) + (v.published ? " · " + vacEsc(vacDate(v.published)) : "") + '</p><span class="vac-go">Открыть на hh.ru →</span></a>';
+}
+// дублируем карточки, чтобы лента крутилась без разрыва
+function vacLoop() {
+  var t = document.getElementById("hh-vacancies"); if (!t) return;
+  t.querySelectorAll("[data-clone]").forEach(function (n) { n.remove(); });
+  var items = Array.prototype.slice.call(t.children);
+  items.forEach(function (n) { var c = n.cloneNode(true); c.setAttribute("data-clone", "1"); c.setAttribute("aria-hidden", "true"); c.setAttribute("tabindex", "-1"); t.appendChild(c); });
+  t.style.setProperty("--dur", Math.max(40, items.length * 7) + "s");
+}
+function loadVacancies() {
+  var t = document.getElementById("hh-vacancies"); if (!t || !window.fetch) return;
+  fetch(VAC_URL, { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (d) {
+    if (!d || !d.items || !d.items.length) return;
+    t.innerHTML = d.items.map(vacCard).join(""); vacLoop();
+  }).catch(function () { /* сервера нет - остаются заглушки */ });
+}
+vacLoop(); loadVacancies(); setInterval(loadVacancies, VAC_REFRESH_MS);
+
 
 // Карточки спикеров: переворот по клику / Enter / пробелу
 document.addEventListener("click", function (e) { var c = e.target.closest(".flip"); if (c) c.classList.toggle("is-flipped"); });
