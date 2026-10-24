@@ -152,3 +152,6 @@ a.vac-card:hover{border-color:var(--ac);transform:translateY(-3px);box-shadow:0 
 .hh-widget{display:block;overflow-x:auto;overflow-y:hidden;min-height:0}
 .hh-scale{width:1260px;transform-origin:left top}
 .f-btnwrap .f-res img{width:0;min-width:75%}
+.author-grid{align-items:stretch}
+.flip-wrap{display:flex}.flip-wrap .flip{flex:1 1 auto;max-width:360px;display:flex}.flip-wrap .flip-in{flex:1}
+@media(min-width:900px){.author-grid{grid-template-columns:360px 1fr}.flip-wrap{order:-1}}
