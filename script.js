@@ -207,3 +207,23 @@ document.addEventListener("keydown", function (e) {
   }
   fit(); window.addEventListener("resize", fit);
 })();
+
+// Виджет вакансий: разряды в суммах зарплат (300000 -> 300 000). Виджет сам форматирования не делает, поправим в странице.
+(function () {
+  var box = document.querySelector(".hh-widget");
+  if (!box || !window.MutationObserver) return;
+  var busy = false;
+  function fmt() {
+    if (busy) return; busy = true;
+    var w = document.createTreeWalker(box, NodeFilter.SHOW_TEXT, null), n;
+    while ((n = w.nextNode())) {
+      var t = n.nodeValue;
+      if (t.indexOf("\u20BD") === -1 && !/\d{4,}/.test(t)) continue;
+      var r = t.replace(/\d{4,}/g, function (d) { return d.replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0"); });
+      if (r !== t) n.nodeValue = r;
+    }
+    busy = false;
+  }
+  new MutationObserver(fmt).observe(box, { childList: true, subtree: true, characterData: true });
+  fmt();
+})();
