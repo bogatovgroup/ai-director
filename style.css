@@ -119,3 +119,5 @@ footer .f-col .f-soc{margin:0 0 28px}
 .amb-card .cap{position:absolute;left:0;right:0;bottom:0;padding:34px 16px 14px;background:linear-gradient(transparent,rgba(5,0,8,.88));font-family:var(--disp);font-weight:700;font-size:16px}
 .amb-empty{border:2px dashed var(--ac);background:var(--card);display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--ac-b);font-family:var(--disp);font-weight:700;font-size:18px;transition:.2s}
 .amb-empty:hover{background:rgba(124,58,237,.18);color:#fff}
+.amb-card{flex:0 0 min(360px,86%);aspect-ratio:auto;min-height:440px}
+.amb-card img{object-position:center 12%}
