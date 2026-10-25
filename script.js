@@ -228,3 +228,12 @@ document.addEventListener("keydown", function (e) {
   new MutationObserver(fmt).observe(box, { childList: true, subtree: true, characterData: true });
   fmt();
 })();
+
+// Окно «Стать амбассадором»: приглашение перейти на ai-dir.ru
+(function () {
+  var d = document.getElementById("ambDialog");
+  if (!d || !d.showModal) return;
+  document.querySelectorAll("[data-amb]").forEach(function (a) { a.addEventListener("click", function (e) { e.preventDefault(); d.showModal(); }); });
+  d.querySelector(".x").addEventListener("click", function () { d.close(); });
+  d.addEventListener("click", function (e) { if (e.target === d) d.close(); });
+})();
