@@ -196,3 +196,12 @@ a.vac-card:hover{border-color:var(--ac);transform:translateY(-3px);box-shadow:0 
 /* Переключатель темы скрыт: сайт всегда тёмный. Чтобы вернуть, удалите это правило и включите THEME_SWITCH в theme.js */
 .theme-toggle{display:none}
 dialog{overflow:hidden}
+/* Окно документа */
+#docDialog{width:min(920px,94vw);max-width:94vw;height:min(88vh,920px);padding:0;border-radius:18px;display:none;flex-direction:column;position:fixed}
+#docDialog[open]{display:flex}
+#docDialog .x{position:absolute;top:10px;right:14px;z-index:3;float:none;width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,.25);line-height:1}
+.doc-scroll{overflow:auto;padding:28px 32px 32px;flex:1;overscroll-behavior:contain}
+.doc-scroll .doc{max-width:none}.doc-scroll .doc-h{font-size:clamp(22px,3vw,34px);padding-right:44px}
+.doc-pdf{width:100%;height:calc(100% - 40px);min-height:60vh;border:0;background:#fff;border-radius:8px}
+.doc-loading{color:var(--mut)}
+@media(max-width:560px){.doc-scroll{padding:22px 18px 24px}}
