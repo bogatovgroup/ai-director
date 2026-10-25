@@ -237,3 +237,35 @@ document.addEventListener("keydown", function (e) {
   d.querySelector(".x").addEventListener("click", function () { d.close(); });
   d.addEventListener("click", function (e) { if (e.target === d) d.close(); });
 })();
+
+// Виджет вакансий: скрываем карточки без видимой зарплаты и пропускаем пустые страницы.
+// Виджет сам такие вакансии не отсеивает (для них HeadHunter не отдаёт сумму), поэтому делаем это на странице.
+(function () {
+  var box = document.querySelector(".hh-widget");
+  if (!box || !window.MutationObserver) return;
+  var busy = false, dir = 1, hops = 0, PRICE = /\d[\d\u00A0 ]*\s*(\u20BD|\$|\u20AC)/;
+  function arrows() { var s = box.querySelectorAll("svg"); return s.length >= 2 ? { prev: s[0], next: s[1] } : null; }
+  function press(el) { ["mousedown", "mouseup", "click"].forEach(function (t) { el.dispatchEvent(new MouseEvent(t, { bubbles: true, cancelable: true, view: window })); }); }
+  function clean() {
+    if (busy) return; busy = true;
+    var cards = box.querySelectorAll('a[href*="/vacancy/"]'), shown = 0;
+    cards.forEach(function (a) {
+      if (PRICE.test(a.innerText)) { a.style.display = ""; shown++; } else { a.style.display = "none"; }
+    });
+    var ar = arrows();
+    if (cards.length && !shown && ar && hops < 30) {
+      hops++;
+      var m = box.innerText.match(/(\d+)\s*\/\s*(\d+)/), atEnd = m && m[1] === m[2], atStart = m && m[1] === "1";
+      if (dir > 0 && atEnd) dir = -1; else if (dir < 0 && atStart) dir = 1;
+      setTimeout(function () { press(dir > 0 ? ar.next : ar.prev); }, 0);
+    } else { hops = 0; }
+    busy = false;
+  }
+  box.addEventListener("click", function (e) {
+    var ar = arrows(); if (!ar) return;
+    var t = e.target.closest ? e.target.closest("svg") : null;
+    if (t === ar.next) dir = 1; else if (t === ar.prev) dir = -1;
+  }, true);
+  new MutationObserver(function () { setTimeout(clean, 0); }).observe(box, { childList: true, subtree: true });
+  clean();
+})();
