@@ -205,3 +205,88 @@ dialog{overflow:hidden}
 .doc-pdf{width:100%;height:calc(100% - 40px);min-height:60vh;border:0;background:#fff;border-radius:8px}
 .doc-loading{color:var(--mut)}
 @media(max-width:560px){.doc-scroll{padding:22px 18px 24px}}
+
+/* ======== Адаптивность: ноутбуки, большие мониторы, планшеты, телефоны (портрет и ландшафт) ======== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+img,video,canvas,iframe,svg{max-width:100%}
+/* зоны выреза iPhone/Android в горизонтальной ориентации */
+.wrap{padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}
+header{padding-top:env(safe-area-inset-top);-webkit-backdrop-filter:blur(12px)}
+footer{padding-bottom:max(28px,env(safe-area-inset-bottom))}
+.cookie{left:max(16px,env(safe-area-inset-left));right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom))}
+/* сетка "что получите": не шире экрана на телефонах 320-360 px */
+.grid.two{grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr))}
+.grid{grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr))}
+/* таблицы документов прокручиваются, а не распирают страницу */
+.doc-t{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* бургер */
+.burger{display:none;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card);cursor:pointer;padding:0;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.burger span{display:block;width:20px;height:2px;border-radius:2px;background:var(--fg);transition:.25s}
+.nav-open .burger span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-open .burger span:nth-child(2){opacity:0}
+.nav-open .burger span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+/* ноутбуки и мониторы больше 1600 px */
+@media(min-width:1700px){.wrap{max-width:1320px}body{font-size:17px}.hero-planet{width:min(600px,36vw)}}
+@media(min-width:2200px){.wrap{max-width:1500px}body{font-size:18px}}
+/* планшеты и узкие окна: меню-бургер вместо строки меню */
+@media(max-width:900px){
+  .burger{display:inline-flex}
+  header nav{display:none!important;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:rgba(5,0,8,.97);border-bottom:1px solid var(--line);padding:8px max(20px,env(safe-area-inset-left)) 16px;max-height:calc(100dvh - 70px);overflow-y:auto}
+  .nav-open header nav,header.nav-open nav{display:flex!important}
+  header nav a{margin:0;padding:13px 0;font-size:16px;border-bottom:1px solid var(--line)}
+  header nav a:last-child{border-bottom:0}
+  .hdr-actions{gap:10px}
+}
+/* телефоны в портрете */
+@media(max-width:560px){
+  section{padding:14px 0}
+  h2{margin-bottom:22px}
+  .hdr-actions .btn{padding:11px 16px;font-size:14px}
+  .hero-btns{flex-direction:column;align-items:stretch}
+  .hero-btns .btn{width:100%;max-width:100%;text-align:center}
+  .btn{padding:14px 22px}
+  .sp-head{flex-wrap:wrap}
+  #docDialog{width:calc(100vw - 16px);max-width:none;height:calc(100vh - 16px);height:calc(100dvh - 16px)}
+  .cookie{padding:12px 14px}.cookie .btn{flex:1}
+  .f-btnwrap{width:100%}
+}
+/* телефоны и планшеты в ландшафте (низкий экран) */
+@media(max-height:520px) and (orientation:landscape){
+  header{position:relative}
+  header .wrap{height:54px}
+  section{padding:12px 0}
+  h1{font-size:clamp(34px,7vw,64px)}
+  .hero-planet{position:absolute;right:0;top:-10px;width:min(300px,38vw);margin:0}
+  .hero-btns{flex-direction:row;align-items:center}.hero-btns .btn{width:auto}
+  .hero-cta{width:auto}
+  #docDialog,dialog{max-height:calc(100vh - 16px);max-height:calc(100dvh - 16px)}
+  #docDialog{width:min(920px,calc(100vw - 24px));height:calc(100vh - 16px);height:calc(100dvh - 16px)}
+  .cookie{padding:10px 14px}.cookie p{font-size:13px}.cookie .btn{padding:8px 14px}
+  .doc-scroll{padding:18px 20px 22px}
+  .prob-video{max-width:240px}
+}
+/* телефон в ландшафте и ширина 560-900: два столбца вместо растянутых */
+@media(max-width:900px) and (min-width:561px){.prob-grid{grid-template-columns:240px 1fr}.prob-video{margin:0}}
+@media(max-width:900px){.author-grid{grid-template-columns:1fr}.flip-wrap{order:-1;justify-content:center}.flip-wrap .flip{max-width:360px;width:100%}}
+/* устройства с курсором: плавный наведение; на сенсорных убираем лишнее смещение */
+@media(hover:none){a.vac-card:hover,.doc-card:hover,.btn:hover{transform:none}}
+@media(max-width:380px){
+  .logo{font-size:14px}
+  .burger{width:40px;height:40px}
+  .hdr-actions{gap:6px}
+  .hdr-actions .btn{padding:10px 12px;font-size:13px}
+  header .wrap{gap:8px}
+}
+@media(max-width:560px){
+  .hero-planet{width:min(250px,70vw);margin:-6px auto -34px}
+  .cookie{gap:10px;padding:10px 12px}.cookie p{font-size:12.5px;line-height:1.4;flex-basis:100%}
+  .cookie .btn{padding:10px 8px;font-size:13px}
+}
+@media(max-width:900px){header nav{background:var(--bg)!important;box-shadow:0 18px 40px rgba(0,0,0,.6)}}
+.burger span{flex:0 0 2px;height:2px}
+header{z-index:120}
+@media(max-height:520px) and (orientation:landscape) and (max-width:900px){
+  header nav{display:none!important}
+  header.nav-open nav{display:grid!important;grid-template-columns:1fr 1fr;column-gap:24px}
+  header nav a:nth-last-child(2){border-bottom:0}
+}
