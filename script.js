@@ -44,7 +44,20 @@ quiz.addEventListener("change", () => {
 });
 
 // Баннер cookies: аналитика подключается только после согласия
-function loadAnalytics() { /* сюда добавить код счётчика (Метрика и т.п.) после выбора сервиса */ }
+// Яндекс.Метрика (счётчик 113800499). Подключается ТОЛЬКО после нажатия «Принять все» в баннере cookies
+// (и при повторных визитах, если согласие уже дано). Без согласия ни одного запроса к mc.yandex.ru нет.
+function loadAnalytics() {
+  if (window.__ymLoaded) return;
+  window.__ymLoaded = true;
+  window.dataLayer = window.dataLayer || [];
+  (function (m, e, t, r, i, k, a) {
+    m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
+    m[i].l = 1 * new Date();
+    for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
+    k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a);
+  })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js?id=113800499", "ym");
+  ym(113800499, "init", { ssr: true, webvisor: true, clickmap: true, ecommerce: "dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce: true, trackLinks: true });
+}
 (function () {
   var KEY = "aicorp_cookie", b = document.getElementById("cookie"), v = null;
   try { v = localStorage.getItem(KEY); } catch (e) {}
