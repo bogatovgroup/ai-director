@@ -1,7 +1,7 @@
 // Приём заявок. Если задан вебхук Битрикс24 (crm.lead.add) - заявка уходит в CRM,
-// иначе открывается письмо на info@ai-corp.by (mailto). Секреты в публичный репозиторий не коммитить.
+// иначе открывается письмо на info@aiskolkovo.ru (mailto). Секреты в публичный репозиторий не коммитить.
 const BITRIX_WEBHOOK = "";
-const MAIL = "info@ai-corp.by";
+const MAIL = "info@aiskolkovo.ru";
 
 const who = document.getElementById("who"), company = document.getElementById("company");
 who.addEventListener("change", () => { const c = who.value === "компанию"; company.style.display = c ? "" : "none"; company.required = c; });

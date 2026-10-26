@@ -20,7 +20,7 @@ $cfg = [
     'employer_ids' => [],      // например [1740, 3529]; такие компании считаются крупными всегда
     'cache_ttl'  => 900,
     'employer_cache_ttl' => 604800, // карточку работодателя кэшируем на неделю
-    'user_agent' => 'AI-DIR-CAIO/1.0 (info@ai-corp.by)',
+    'user_agent' => 'AI-DIR-CAIO/1.0 (info@aiskolkovo.ru)',
 ];
 
 $token = getenv('HH_TOKEN');
