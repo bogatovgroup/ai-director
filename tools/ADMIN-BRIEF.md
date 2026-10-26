@@ -48,3 +48,12 @@
 
 ## 7. Чего на сервере быть не должно
 `tools/`, `extras/` (в папку `dist/` они не попадают), любые `.py`, `.md`, `.git`, пароли в открытом виде внутри каталога сайта.
+
+## 8. Ответ администратора: веб-сервер Caddy
+Администратор выбрал **Caddy** вместо nginx. Готовый файл: `tools/Caddyfile` (домен ai-dir.ru уже подставлен). Что учесть:
+- Сертификаты Let's Encrypt Caddy выпускает и продлевает сам, certbot и раздел про сертификат в `DEPLOY-hsvds.md` (шаг 5) не нужны. Нужны открытые порты 80 и 443 и DNS без проксирования (серое облако в Cloudflare).
+- **PHP: версия 8.1 или новее (рекомендуется 8.3), PHP-FPM** с расширениями `curl` и `mbstring`. Файл `/run/php/phpX.Y-fpm.sock` указать в строке `php_fastcgi` в Caddyfile.
+- Папка сайта `/var/www/aidir`, файл настроек заявок `/var/www/lead_config.php`, каталог журнала `/var/lib/aidir-leads` (шаг 6 в `DEPLOY-hsvds.md` остаётся в силе).
+- Файлы `.htaccess` и `tools/nginx-site.conf` при Caddy не используются.
+- Если Caddy нужен только как прокси к другому серверу (nginx/Apache на локальном порту), заголовки безопасности и кэш из `Caddyfile` перенести в тот сервер или оставить в Caddy, а обработку статики и PHP заменить одной строкой `reverse_proxy 127.0.0.1:ПОРТ`.
+- Проверить `caddy validate --config /etc/caddy/Caddyfile` и `sudo systemctl reload caddy`; журнал: `/var/log/caddy/aidir.access.log` (создать каталог и выдать права пользователю `caddy`).

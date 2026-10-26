@@ -1,0 +1,95 @@
+# Caddy 2 для сайта ai-dir.ru: статика + PHP-обработчик заявок. Файл положить в /etc/caddy/Caddyfile, затем: sudo systemctl reload caddy
+# Сертификаты Let's Encrypt Caddy получает и продлевает сам (certbot не нужен). Условия: порты 80 и 443 открыты,
+# DNS-записи ai-dir.ru и www указывают на сервер (в Cloudflare режим «DNS only», серое облако).
+# Версию PHP-FPM в строке php_fastcgi указать по факту: ls /run/php/
+#
+# Если Caddy должен только проксировать на другой сервер (nginx/Apache на 127.0.0.1:8080), вместо блока handle { file_server }
+# и php_fastcgi используйте одну строку: reverse_proxy 127.0.0.1:8080 (заголовки и кэш тогда держать в одном месте).
+
+{
+	email info@aiskolkovo.ru
+}
+
+www.ai-dir.ru {
+	redir https://ai-dir.ru{uri} permanent
+}
+
+ai-dir.ru {
+	root * /var/www/aidir
+	encode zstd gzip
+
+	# Заявки маленькие: большие запросы не нужны
+	request_body {
+		max_size 64KB
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+		X-Frame-Options "SAMEORIGIN"
+		# CSP сначала в режиме наблюдения. Когда в консоли браузера нет нарушений, заменить на Content-Security-Policy.
+		Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' https://widgets.hh.ru 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.hhcdn.ru; font-src 'self' https://*.hhcdn.ru; connect-src 'self' https://widgets.hh.ru https://api.hh.ru; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
+		-Server
+	}
+
+	# --- Кэш браузера ---
+	@static path_regexp static \.(webp|jpg|jpeg|png|svg|ico|woff2|mp4|webm)$
+	header @static Cache-Control "public, max-age=31536000, immutable"
+
+	@assets path_regexp assets \.(css|js|webmanifest)$
+	header @assets Cache-Control "public, max-age=2592000, must-revalidate"
+
+	@pdf path_regexp pdf \.pdf$
+	header @pdf Cache-Control "public, max-age=2592000"
+
+	@html path_regexp html \.html$
+	header @html Cache-Control "no-cache"
+
+	# --- Служебное закрыто (отдаётся страница 404) ---
+	@blocked {
+		path /tools/* /extras/* /lead_config.php /hh_config.php
+		path_regexp blocked \.(py|md|log|sql|bak|jsonl)$
+	}
+	@dotfiles {
+		path /.*
+		not path /.well-known/*
+	}
+	handle @blocked {
+		error 404
+	}
+	handle @dotfiles {
+		error 404
+	}
+
+	# --- PHP только для приёма заявок, остальные .php закрыты ---
+	@lead path /api/lead.php
+	handle @lead {
+		php_fastcgi unix//run/php/php8.3-fpm.sock
+	}
+	@otherphp path *.php
+	handle @otherphp {
+		error 404
+	}
+
+	# --- Всё остальное: статические файлы ---
+	handle {
+		file_server
+	}
+
+	# --- Страница 404 со статусом 404 ---
+	handle_errors {
+		rewrite * /404.html
+		file_server {
+			status {err.status_code}
+		}
+	}
+
+	log {
+		output file /var/log/caddy/aidir.access.log {
+			roll_size 20MiB
+			roll_keep 10
+		}
+	}
+}
