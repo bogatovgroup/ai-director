@@ -290,3 +290,4 @@ header{z-index:120}
   header.nav-open nav{display:grid!important;grid-template-columns:1fr 1fr;column-gap:24px}
   header nav a:nth-last-child(2){border-bottom:0}
 }
+.f-btnwrap .f-res img{width:0;min-width:60%}
