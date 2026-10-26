@@ -21,9 +21,7 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;heigh
 .sub{font-family:var(--disp);font-weight:600;font-size:clamp(18px,2.2vw,27px);color:#ffffffe6;max-width:760px;margin:24px 0 32px}
 .grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
-.card .n{font-family:var(--disp);font-weight:900;color:var(--ac);font-size:28px}
 .card ul{padding-left:18px;color:var(--mut);margin-top:10px}.card p{color:var(--mut);margin-top:8px}
-.stat{font-family:var(--disp);font-weight:900;font-size:44px}
 .ph{border:1px dashed var(--ac);color:var(--ac-b);border-radius:12px;padding:14px;text-align:center;font-size:14px;margin-top:12px}
 .img{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;background:var(--bg2)}
 details{border:1px solid var(--line);border-radius:14px;margin-bottom:12px;background:var(--card)}
@@ -64,10 +62,6 @@ footer:before{content:"";position:absolute;width:600px;height:600px;left:-150px;
 footer a{margin-right:0;text-decoration:none}
 .f-bottom{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:36px;padding-top:20px;font-size:13px;position:relative}
 @media(max-width:900px){.f-grid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.f-grid{grid-template-columns:1fr}}
-.f-eco{margin-top:0;padding:28px;border-radius:18px;background:linear-gradient(135deg,#2a0f55,#14062a);border:1px solid var(--line);position:relative}
-.f-eco h3{font-size:clamp(18px,2.4vw,26px);text-transform:uppercase;font-weight:700;margin-bottom:18px}
-.f-sk{display:flex;align-items:center;gap:16px;margin-bottom:22px}.f-sk p{max-width:340px;font-size:15px;color:#ffffffd9;line-height:1.35}
-.sk-logo{font-family:var(--sans);font-weight:800;font-size:38px;line-height:1;letter-spacing:-.04em}
 .f-soc{display:flex;gap:14px}.f-soc a{width:52px;height:52px;border-radius:50%;background:#fff;color:#1a0a33;display:flex;align-items:center;justify-content:center;transition:.2s}
 .f-soc a:hover{transform:translateY(-3px);background:var(--ac-b);color:#1a0a33}.f-soc svg{width:26px;height:26px}
 footer .f-col .f-soc{margin:0 0 28px}
@@ -111,9 +105,9 @@ footer .f-col .f-soc{margin:0 0 28px}
 .hero h1{font-size:clamp(40px,7vw,88px)}
 @media(max-width:900px){.hero-planet{position:relative;right:auto;top:auto;width:min(340px,80vw);margin:0 auto -20px}}
 .av{background-repeat:no-repeat;color:transparent;border:2px solid var(--ac);overflow:hidden}
-.av-mp{background-image:url(img/speakers/petrushkevich.jpg),linear-gradient(135deg,var(--ac),var(--ac-d));background-size:89px auto,cover;background-position:-9px 0,0 0}
-.av-ap{background-image:url(img/speakers/pan.jpg),linear-gradient(135deg,var(--ac),var(--ac-d));background-size:110px auto,cover;background-position:-14px 0,0 0}
-.av-sk{background-image:url(img/speakers/kuryan.jpg),linear-gradient(135deg,var(--ac),var(--ac-d));background-size:103px auto,cover;background-position:-18px 0,0 0}
+.av-mp{background-image:url(img/speakers/av-petrushkevich.webp),linear-gradient(135deg,var(--ac),var(--ac-d));background-size:cover,cover;background-position:center,0 0}
+.av-ap{background-image:url(img/speakers/av-pan.webp),linear-gradient(135deg,var(--ac),var(--ac-d));background-size:cover,cover;background-position:center,0 0}
+.av-sk{background-image:url(img/speakers/av-kuryan.webp),linear-gradient(135deg,var(--ac),var(--ac-d));background-size:cover,cover;background-position:center,0 0}
 .amb-card{flex:0 0 min(300px,80%);aspect-ratio:1;scroll-snap-align:start;border-radius:16px;position:relative;overflow:hidden;border:1px solid var(--ac);background:var(--bg2);display:block;text-decoration:none}
 .amb-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 18%}
 .amb-card .cap{position:absolute;left:0;right:0;bottom:0;padding:34px 16px 14px;background:linear-gradient(transparent,rgba(5,0,8,.88));font-family:var(--disp);font-weight:700;font-size:16px}
@@ -136,16 +130,7 @@ footer .f-col .f-soc{margin:0 0 28px}
 .prob-video{max-width:320px;width:100%;margin:0 auto}.prob-video video{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:18px;border:1px solid var(--ac);background:#000;box-shadow:0 0 40px #7c3aed40;display:block}
 @media(min-width:900px){.prob-grid{grid-template-columns:320px 1fr}.prob-video{margin:0}}
 .hero-cta{width:320px;max-width:100%;text-align:center}
-.vac-wrap{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
-.vac-track{display:flex;width:max-content;animation:vac-scroll var(--dur,50s) linear infinite}
-.vac-wrap:hover .vac-track,.vac-wrap:focus-within .vac-track{animation-play-state:paused}
-@keyframes vac-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.vac-card{flex:0 0 300px;margin-right:18px;min-height:200px;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;color:inherit;text-decoration:none;transition:.2s}
-a.vac-card:hover{border-color:var(--ac);transform:translateY(-3px);box-shadow:0 0 30px #7c3aed40}
-.vac-card h3{font-size:17px;line-height:1.25;margin-bottom:8px}.vac-co{color:var(--ac-b);font-weight:600;font-size:14px;margin-bottom:6px}.vac-sal{font-weight:600;margin-bottom:6px}.vac-meta{color:var(--mut);font-size:13px}
-.vac-go{margin-top:auto;padding-top:12px;color:var(--ac);font-size:13px;font-weight:600}
-.vac-demo{justify-content:center}.vac-demo .ph{margin:0;min-height:150px;width:100%}
-@media(prefers-reduced-motion:reduce){.vac-track{animation:none}.vac-wrap{overflow-x:auto}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.flip-in,.theme-toggle .knob,.burger span{transition:none}}
 .hh-widget{max-width:100%;overflow-x:auto;min-height:178px;display:flex;justify-content:center}
 .f-btnwrap .f-res img{width:0;min-width:50%}
 .hh-widget{justify-content:flex-start}
@@ -189,8 +174,7 @@ a.vac-card:hover{border-color:var(--ac);transform:translateY(-3px);box-shadow:0 
 [data-theme="light"] .back .cap,[data-theme="light"] .amb-card .cap{color:#fff}
 [data-theme="light"] .amb-empty:hover{color:var(--fg)}
 [data-theme="light"] summary{color:var(--fg)}
-[data-theme="light"] .ins{background:rgba(232,185,49,.3);color:#7a5800}
-[data-theme="light"] .vac-card,[data-theme="light"] .doc-card{color:var(--fg)}
+[data-theme="light"] .ins{background:rgba(232,185,49,.3);color:#7a5800}[data-theme="light"] .doc-card{color:var(--fg)}
 [data-theme="light"] .verdict{background:#fff}
 [data-theme="light"] .hero-planet{filter:none}
 /* Переключатель темы скрыт: сайт всегда тёмный. Чтобы вернуть, удалите это правило и включите THEME_SWITCH в theme.js */
@@ -269,7 +253,7 @@ footer{padding-bottom:max(28px,env(safe-area-inset-bottom))}
 @media(max-width:900px) and (min-width:561px){.prob-grid{grid-template-columns:240px 1fr}.prob-video{margin:0}}
 @media(max-width:900px){.author-grid{grid-template-columns:1fr}.flip-wrap{order:-1;justify-content:center}.flip-wrap .flip{max-width:360px;width:100%}}
 /* устройства с курсором: плавный наведение; на сенсорных убираем лишнее смещение */
-@media(hover:none){a.vac-card:hover,.doc-card:hover,.btn:hover{transform:none}}
+@media(hover:none){.doc-card:hover,.btn:hover{transform:none}}
 @media(max-width:380px){
   .logo{font-size:14px}
   .burger{width:40px;height:40px}
@@ -291,3 +275,4 @@ header{z-index:120}
   header nav a:nth-last-child(2){border-bottom:0}
 }
 .f-btnwrap .f-res img{width:0;min-width:60%}
+.hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}

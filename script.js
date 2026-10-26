@@ -1,6 +1,5 @@
-// Приём заявок. Если задан вебхук Битрикс24 (crm.lead.add) - заявка уходит в CRM,
-// иначе открывается письмо на info@aiskolkovo.ru (mailto). Секреты в публичный репозиторий не коммитить.
-const BITRIX_WEBHOOK = "";
+// Приём заявок: форма отправляется на серверный обработчик api/lead.php (он пишет заявку, шлёт письмо и при необходимости передаёт в Битрикс24).
+// Секреты (вебхук Битрикс24) хранятся только на сервере. Если сервера нет или он не ответил, открывается запасной вариант: письмо (mailto).
 const MAIL = "info@aiskolkovo.ru";
 
 const who = document.getElementById("who"), company = document.getElementById("company");
@@ -8,23 +7,28 @@ who.addEventListener("change", () => { const c = who.value === "компанию
 
 document.querySelector("form.lead-form").addEventListener("submit", async e => {
   e.preventDefault();
-  const f = e.target, m = f.querySelector(".msg"), d = Object.fromEntries(new FormData(f)), q = new URLSearchParams(location.search);
+  const f = e.target, m = f.querySelector(".msg"), btn = f.querySelector("button"), q = new URLSearchParams(location.search);
+  f.elements.page.value = location.href;
+  const d = Object.fromEntries(new FormData(f));
   const text = ["Имя: " + d.name, "Email: " + d.email, "Контакт: " + d.contact, "Формат: " + d.format,
     "Заявка для: " + d.who + (d.company ? " (" + d.company + ")" : ""), "Комментарий: " + (d.comment || "-"),
-    "Согласие на обработку ПДн: да (" + new Date().toISOString() + ", согласие ред. 1.0 от 19.10.2026)",
+    "Согласие на обработку ПДн: да (" + new Date().toISOString() + ", " + d.consent_version + ")",
     "Согласие на рассылки: " + (d.mailing ? "да" : "нет")].join("\n");
-  if (!BITRIX_WEBHOOK) {
+  const fallback = () => {
     location.href = "mailto:" + MAIL + "?subject=" + encodeURIComponent("Заявка: Директор по внедрению ИИ") + "&body=" + encodeURIComponent(text);
     m.textContent = "Открылось письмо в вашей почтовой программе - отправьте его. Если не открылось, напишите на " + MAIL + ".";
-    return;
-  }
-  const fields = { TITLE: "Заявка с сайта: Директор по внедрению ИИ", NAME: d.name, EMAIL: [{ VALUE: d.email, VALUE_TYPE: "WORK" }],
-    COMMENTS: text + "\nСтраница: " + location.href, SOURCE_ID: "WEB", UTM_SOURCE: q.get("utm_source") || "",
-    UTM_MEDIUM: q.get("utm_medium") || "", UTM_CAMPAIGN: q.get("utm_campaign") || "" };
+  };
+  if (btn) btn.disabled = true;
   try {
-    const r = await fetch(BITRIX_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fields }) });
-    if (!r.ok) throw 0; m.textContent = "Спасибо! Мы скоро свяжемся с вами."; f.reset();
-  } catch { m.textContent = "Ошибка отправки. Напишите нам на " + MAIL + "."; }
+    const body = new FormData(f);
+    ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"].forEach(k => { if (q.get(k)) body.append(k, q.get(k)); });
+    const r = await fetch(f.getAttribute("action"), { method: "POST", body, headers: { "Accept": "application/json" } });
+    const res = r.ok ? await r.json().catch(() => null) : null;
+    if (!res || !res.ok) throw 0;
+    m.textContent = "Спасибо! Заявка отправлена, мы скоро свяжемся с вами."; f.reset();
+    company.style.display = "none"; company.required = false;
+  } catch (err) { fallback(); }
+  if (btn) btn.disabled = false;
 });
 
 // Чек-лист: считается на клиенте, ничего не сохраняется и не отправляется
@@ -65,45 +69,6 @@ function loadAnalytics() { /* сюда добавить код счётчика 
     b.addEventListener("click", function () { sc.scrollBy({ left: Number(b.getAttribute("data-sc")) * 380, behavior: "smooth" }); });
   });
 })();
-
-// Вакансии HeadHunter: бегущая лента карточек (справа налево). Данные приходят с вашего сервера (api/vacancies.php),
-// который обращается к API hh.ru с токеном. Пока сервера нет, лента показывает заглушки.
-var VAC_URL = "api/vacancies.php";
-var VAC_REFRESH_MS = 10 * 60 * 1000;
-
-function vacEsc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
-function vacSalary(s) {
-  if (!s || (!s.from && !s.to)) return "Зарплата не указана";
-  var cur = { RUR: "₽", RUB: "₽", USD: "$", EUR: "€", KZT: "₸", BYR: "Br", BYN: "Br" }[s.currency] || (s.currency || "");
-  var f = function (n) { return Number(n).toLocaleString("ru-RU"); };
-  return (s.from ? "от " + f(s.from) + " " : "") + (s.to ? "до " + f(s.to) + " " : "") + cur;
-}
-function vacDate(iso) {
-  var d = new Date(iso); if (isNaN(d)) return "";
-  return d.toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
-}
-function vacCard(v) {
-  return '<a class="vac-card" href="' + vacEsc(v.url) + '" target="_blank" rel="noopener nofollow">' +
-    '<h3>' + vacEsc(v.name) + '</h3><p class="vac-co">' + vacEsc(v.employer) + '</p><p class="vac-sal">' + vacEsc(vacSalary(v.salary)) + '</p>' +
-    '<p class="vac-meta">' + vacEsc(v.area) + (v.published ? " · " + vacEsc(vacDate(v.published)) : "") + '</p><span class="vac-go">Открыть на hh.ru →</span></a>';
-}
-// дублируем карточки, чтобы лента крутилась без разрыва
-function vacLoop() {
-  var t = document.getElementById("hh-vacancies"); if (!t) return;
-  t.querySelectorAll("[data-clone]").forEach(function (n) { n.remove(); });
-  var items = Array.prototype.slice.call(t.children);
-  items.forEach(function (n) { var c = n.cloneNode(true); c.setAttribute("data-clone", "1"); c.setAttribute("aria-hidden", "true"); c.setAttribute("tabindex", "-1"); t.appendChild(c); });
-  t.style.setProperty("--dur", Math.max(40, items.length * 7) + "s");
-}
-function loadVacancies() {
-  var t = document.getElementById("hh-vacancies"); if (!t || !window.fetch) return;
-  fetch(VAC_URL, { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (d) {
-    if (!d || !d.items || !d.items.length) return;
-    t.innerHTML = d.items.map(vacCard).join(""); vacLoop();
-  }).catch(function () { /* сервера нет - остаются заглушки */ });
-}
-vacLoop(); loadVacancies(); setInterval(loadVacancies, VAC_REFRESH_MS);
-
 
 // Карточки спикеров: переворот по клику / Enter / пробелу
 document.addEventListener("click", function (e) { var c = e.target.closest(".flip"); if (c) c.classList.toggle("is-flipped"); });

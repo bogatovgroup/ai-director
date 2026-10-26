@@ -1,0 +1,73 @@
+# ============ Настройки сервера Apache для сайта (положить в корень сайта) ============
+# Домен нигде не прописан: правила работают для любого адреса.
+
+Options -Indexes
+DirectoryIndex index.html
+ErrorDocument 404 /404.html
+AddDefaultCharset UTF-8
+
+# --- Один основной адрес: https и без www ---
+RewriteEngine On
+# Если хостинг стоит за прокси/CDN и флаг HTTPS не виден, заменить условие на: RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# --- Закрыть служебное ---
+RedirectMatch 404 /\.git
+<FilesMatch "(^\.(?!well-known)|\.(md|log|sql|bak|py|jsonl)$|^lead_config\.php$|^hh_config\.php$)">
+  Require all denied
+</FilesMatch>
+
+# --- Типы файлов ---
+AddType image/webp .webp
+AddType image/avif .avif
+AddType font/woff2 .woff2
+AddType video/mp4 .mp4
+AddType video/webm .webm
+AddType application/manifest+json .webmanifest
+
+# --- Сжатие ---
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/css application/javascript text/javascript application/json image/svg+xml application/manifest+json
+</IfModule>
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript text/javascript application/json image/svg+xml application/manifest+json
+</IfModule>
+
+# --- Кэш браузера ---
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType text/javascript "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType video/mp4 "access plus 1 year"
+  ExpiresByType application/pdf "access plus 1 month"
+</IfModule>
+<IfModule mod_headers.c>
+  # CSS и JS без хэшей в именах: кэш на месяц с перепроверкой. Когда появятся хэши в именах, поставить immutable и год.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(webp|jpg|png|svg|ico|woff2|mp4)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # --- Заголовки безопасности ---
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  # Content-Security-Policy в режиме Report-Only: сначала только наблюдаем, потом включаем боевой.
+  # Виджет HeadHunter и шрифты Google требуют своих доменов. После перехода на свои шрифты можно убрать fonts.googleapis.com и fonts.gstatic.com.
+  Header always set Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' https://widgets.hh.ru 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://*.hhcdn.ru; font-src 'self' https://fonts.gstatic.com https://*.hhcdn.ru; connect-src 'self' https://widgets.hh.ru https://api.hh.ru; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
+</IfModule>
