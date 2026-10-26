@@ -6,7 +6,10 @@
 //     'mail_to'        => 'info@aiskolkovo.ru',
 //     'mail_from'      => 'no-reply@ВАШ-ДОМЕН.ru',
 //     'bitrix_webhook' => 'https://ВАШ.bitrix24.ru/rest/1/КОД/crm.lead.add.json', // права вебхука: только crm.lead.add
-//     'log_dir'        => '/home/user/leads',   // вне папки сайта, права 700
+//     'log_dir'        => '/var/lib/aidir-leads',   // вне папки сайта, права 700, владелец - пользователь PHP-FPM
+//     // Отправка писем через SMTP (рекомендуется на VDS: порт 25 у провайдеров обычно закрыт, а mail() попадает в спам):
+//     'smtp_host' => 'smtp.yandex.ru', 'smtp_port' => 465, 'smtp_secure' => 'ssl', // или порт 587 и 'tls'
+//     'smtp_user' => 'info@aiskolkovo.ru', 'smtp_pass' => 'ПАРОЛЬ-ПРИЛОЖЕНИЯ',
 //     'allowed_hosts'  => ['ВАШ-ДОМЕН.ru', 'www.ВАШ-ДОМЕН.ru'],
 //   ];
 
@@ -32,6 +35,7 @@ $cfg = [
     'mail_from' => getenv('LEAD_MAIL_FROM') ?: '',
     'bitrix_webhook' => getenv('LEAD_BITRIX_WEBHOOK') ?: '',
     'log_dir' => getenv('LEAD_LOG_DIR') ?: '',
+    'smtp_host' => '', 'smtp_port' => 465, 'smtp_secure' => 'ssl', 'smtp_user' => '', 'smtp_pass' => '',
     'allowed_hosts' => [],
 ];
 $file = __DIR__ . '/../../lead_config.php';
@@ -64,6 +68,60 @@ if (is_file($rateFile)) {
     $hits = array_values(array_filter($hits, fn($t) => $t > $now - 3600));
 }
 if (count($hits) >= 5) { out(429, ['ok' => false, 'error' => 'rate_limited']); }
+
+// Минимальный SMTP-клиент без сторонних библиотек: SSL (порт 465) или STARTTLS (587), авторизация LOGIN
+function smtp_send(array $c, string $to, string $subject, string $body, string $from, string $replyTo): bool {
+    $secure = $c['smtp_secure'] ?? 'ssl';
+    $remote = ($secure === 'ssl' ? 'ssl://' : '') . $c['smtp_host'] . ':' . (int)($c['smtp_port'] ?? 465);
+    $fp = @stream_socket_client($remote, $errno, $errstr, 10);
+    if (!$fp) { return false; }
+    stream_set_timeout($fp, 10);
+    $crlf = "\r\n";
+    $read = function () use ($fp): string {
+        $r = '';
+        while (($l = fgets($fp, 515)) !== false) { $r .= $l; if (strlen($l) < 4 || $l[3] === ' ') { break; } }
+        return $r;
+    };
+    $cmd = function (string $line) use ($fp, $read, $crlf): string { fwrite($fp, $line . $crlf); return $read(); };
+    $is = fn(string $r, string $code): bool => strncmp($r, $code, 3) === 0;
+    $domain = preg_replace('/[^a-z0-9.-]/i', '', (string)($_SERVER['HTTP_HOST'] ?? 'localhost')) ?: 'localhost';
+    try {
+        if (!$is($read(), '220')) { throw new Exception('greeting'); }
+        if (!$is($cmd('EHLO ' . $domain), '250')) { throw new Exception('ehlo'); }
+        if ($secure === 'tls') {
+            if (!$is($cmd('STARTTLS'), '220')) { throw new Exception('starttls'); }
+            if (!stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) { throw new Exception('tls'); }
+            if (!$is($cmd('EHLO ' . $domain), '250')) { throw new Exception('ehlo2'); }
+        }
+        if (($c['smtp_user'] ?? '') !== '') {
+            if (!$is($cmd('AUTH LOGIN'), '334')) { throw new Exception('auth'); }
+            if (!$is($cmd(base64_encode($c['smtp_user'])), '334')) { throw new Exception('user'); }
+            if (!$is($cmd(base64_encode($c['smtp_pass'])), '235')) { throw new Exception('pass'); }
+        }
+        $fromAddr = preg_match('/<([^>]+)>/', $from, $m) ? $m[1] : $from;
+        if (!$is($cmd('MAIL FROM:<' . $fromAddr . '>'), '250')) { throw new Exception('from'); }
+        $rcpt = $cmd('RCPT TO:<' . $to . '>');
+        if (!$is($rcpt, '250') && !$is($rcpt, '251')) { throw new Exception('rcpt'); }
+        if (!$is($cmd('DATA'), '354')) { throw new Exception('data'); }
+        $msg = 'Date: ' . date('r') . $crlf
+            . 'From: ' . $from . $crlf
+            . 'To: ' . $to . $crlf
+            . 'Reply-To: ' . str_replace(["\r", "\n"], '', $replyTo) . $crlf
+            . 'Subject: =?UTF-8?B?' . base64_encode($subject) . '?=' . $crlf
+            . 'Message-ID: <' . bin2hex(random_bytes(8)) . '@' . $domain . '>' . $crlf
+            . 'MIME-Version: 1.0' . $crlf . 'Content-Type: text/plain; charset=UTF-8' . $crlf
+            . 'Content-Transfer-Encoding: base64' . $crlf . $crlf
+            . chunk_split(base64_encode($body));
+        fwrite($fp, $msg . $crlf . '.' . $crlf);   // тело в base64: строк, начинающихся с точки, не бывает
+        $ok = $is($read(), '250');
+        $cmd('QUIT');
+        fclose($fp);
+        return $ok;
+    } catch (Throwable $e) {
+        @fclose($fp);
+        return false;
+    }
+}
 
 // ---- Данные ----
 function field(string $k, int $max): string {
@@ -136,8 +194,12 @@ if ($cfg['mail_to'] !== '') {
         'From: ' . $from,
         'Reply-To: ' . str_replace(["\r", "\n"], '', $email),
     ];
-    $subject = '=?UTF-8?B?' . base64_encode('Заявка с сайта: ' . $format) . '?=';
-    $mailed = @mail($cfg['mail_to'], $subject, $body, implode("\r\n", $headers));
+    if ($cfg['smtp_host'] !== '') {
+        $mailed = smtp_send($cfg, $cfg['mail_to'], 'Заявка с сайта: ' . $format, $body, $from, $email);
+    } else {
+        $subject = '=?UTF-8?B?' . base64_encode('Заявка с сайта: ' . $format) . '?=';
+        $mailed = @mail($cfg['mail_to'], $subject, $body, implode("\r\n", $headers));
+    }
 }
 
 // ---- 3) Битрикс24 (необязательно). Сбой CRM не должен ломать приём заявки ----

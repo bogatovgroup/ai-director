@@ -68,6 +68,6 @@ AddType application/manifest+json .webmanifest
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
   Header always set X-Frame-Options "SAMEORIGIN"
   # Content-Security-Policy в режиме Report-Only: сначала только наблюдаем, потом включаем боевой.
-  # Виджет HeadHunter и шрифты Google требуют своих доменов. После перехода на свои шрифты можно убрать fonts.googleapis.com и fonts.gstatic.com.
-  Header always set Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' https://widgets.hh.ru 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://*.hhcdn.ru; font-src 'self' https://fonts.gstatic.com https://*.hhcdn.ru; connect-src 'self' https://widgets.hh.ru https://api.hh.ru; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
+  # Шрифты свои (папка fonts/). Виджет HeadHunter требует домены widgets.hh.ru и hhcdn.ru.
+  Header always set Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' https://widgets.hh.ru 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.hhcdn.ru; font-src 'self' https://*.hhcdn.ru; connect-src 'self' https://widgets.hh.ru https://api.hh.ru; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
 </IfModule>
