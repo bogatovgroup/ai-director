@@ -1,6 +1,6 @@
 # Выгрузка сайта на VDS (hsvds.ru): пошаговая инструкция
 
-hsvds.ru предлагает VDS на KVM (дата-центр в Москве). Это отдельный сервер, который настраиваете вы (или ваш администратор). Готовой панели для сайтов на нём нет, поэтому ниже всё по шагам. Домен в примерах: `example.ru`, замените на свой.
+hsvds.ru предлагает VDS на KVM (дата-центр в Москве). Это отдельный сервер, который настраиваете вы (или ваш администратор). Готовой панели для сайтов на нём нет, поэтому ниже всё по шагам. Домен в примерах: `ai-dir.ru`, замените на свой.
 
 ## 0. Что заказать
 - Образ: **Ubuntu 24.04 (или 22.04) с LEMP**. Если такого образа нет, возьмите чистую Ubuntu и поставьте пакеты командой из шага 3.
@@ -10,8 +10,8 @@ hsvds.ru предлагает VDS на KVM (дата-центр в Москве)
 
 ## 1. Домен и DNS
 У регистратора домена создайте записи:
-- `A` для `example.ru` на IP сервера;
-- `A` для `www.example.ru` на тот же IP (или CNAME на `example.ru`).
+- `A` для `ai-dir.ru` на IP сервера;
+- `A` для `www.ai-dir.ru` на тот же IP (или CNAME на `ai-dir.ru`).
 Изменения доходят от 15 минут до нескольких часов.
 
 ## 2. Первичная защита сервера (один раз)
@@ -36,7 +36,7 @@ ls /run/php/            # найти файл вида php8.3-fpm.sock
 ## 4. Сборка и загрузка сайта
 На своём компьютере в папке проекта:
 ```
-python tools/build_dist.py example.ru
+python tools/build_dist.py ai-dir.ru
 ```
 Появится папка `dist`. Загрузите её содержимое на сервер в `/var/www/aidir`:
 - программой WinSCP или FileZilla (протокол SFTP, пользователь `deploy`), либо
@@ -51,13 +51,13 @@ sudo find /var/www/aidir -type f -exec chmod 644 {} \;
 
 ## 5. Настройка nginx
 1. Скопируйте файл `tools/nginx-site.conf` на сервер в `/etc/nginx/sites-available/aidir`.
-2. Замените везде `example.ru` на свой домен и версию PHP в строке `fastcgi_pass` на свою.
+2. Замените везде `ai-dir.ru` на свой домен и версию PHP в строке `fastcgi_pass` на свою.
 3. **Сначала получите сертификат** (до этого блоки с `ssl_certificate` вызовут ошибку). Для первого запуска временно закомментируйте в конфиге блоки 2 и 3 (с `listen 443`) и оставьте только блок 1, затем:
 ```bash
 sudo ln -s /etc/nginx/sites-available/aidir /etc/nginx/sites-enabled/aidir
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t && sudo systemctl reload nginx
-sudo certbot certonly --webroot -w /var/www/aidir -d example.ru -d www.example.ru --email info@aiskolkovo.ru --agree-tos
+sudo certbot certonly --webroot -w /var/www/aidir -d ai-dir.ru -d www.ai-dir.ru --email info@aiskolkovo.ru --agree-tos
 ```
 4. Верните закомментированные блоки, снова `sudo nginx -t && sudo systemctl reload nginx`.
 5. Продление сертификата идёт автоматически; проверка: `sudo certbot renew --dry-run`.
@@ -74,7 +74,7 @@ sudo chown www-data:www-data /var/www/lead_config.php && sudo chmod 640 /var/www
 <?php return [
   'mail_to'        => 'info@aiskolkovo.ru',
   'mail_from'      => 'info@aiskolkovo.ru',
-  'allowed_hosts'  => ['example.ru', 'www.example.ru'],
+  'allowed_hosts'  => ['ai-dir.ru', 'www.ai-dir.ru'],
   'log_dir'        => '/var/lib/aidir-leads',
   // SMTP вашей почты (пример для Яндекс 360; параметры уточните у провайдера почты):
   'smtp_host' => 'smtp.yandex.ru', 'smtp_port' => 465, 'smtp_secure' => 'ssl',
@@ -89,13 +89,13 @@ sudo chown www-data:www-data /var/www/lead_config.php && sudo chmod 640 /var/www
 У VDS-провайдеров порт 25 часто закрыт, а письма, отправленные с самого сервера, попадают в спам без настройки SPF/DKIM/DMARC. Отправка через SMTP вашей корпоративной почты решает обе проблемы. Обработчик `api/lead.php` уже умеет SMTP (порты 465 SSL и 587 STARTTLS). Заявки дополнительно пишутся в файл `/var/lib/aidir-leads/leads.jsonl`, поэтому не теряются, даже если письмо не дошло.
 
 ## 8. Проверка
-1. Откройте `https://example.ru`: замок в адресной строке, сайт загружается, `http://` и `www` перенаправляют на основной адрес.
+1. Откройте `https://ai-dir.ru`: замок в адресной строке, сайт загружается, `http://` и `www` перенаправляют на основной адрес.
 2. Отправьте тестовую заявку: письмо пришло, запись появилась в `leads.jsonl` (`sudo tail /var/lib/aidir-leads/leads.jsonl`).
-3. Откройте `https://example.ru/несуществующая` (должна показаться страница 404), `https://example.ru/robots.txt`, `https://example.ru/sitemap.xml`.
+3. Откройте `https://ai-dir.ru/несуществующая` (должна показаться страница 404), `https://ai-dir.ru/robots.txt`, `https://ai-dir.ru/sitemap.xml`.
 4. Проверьте на телефоне: меню, форму, видео, документы.
 5. Прогоните сайт через PageSpeed Insights, securityheaders.com и ssllabs.com.
 6. Откройте в браузере консоль (F12): ошибки `Content-Security-Policy-Report-Only` покажут, что нужно разрешить; когда их не останется, замените в nginx `Content-Security-Policy-Report-Only` на `Content-Security-Policy`.
-7. Проверьте, что служебное закрыто: `https://example.ru/lead_config.php`, `https://example.ru/.git/config`, `https://example.ru/api/lead.php` (GET) не должны отдавать содержимое.
+7. Проверьте, что служебное закрыто: `https://ai-dir.ru/lead_config.php`, `https://ai-dir.ru/.git/config`, `https://ai-dir.ru/api/lead.php` (GET) не должны отдавать содержимое.
 
 ## 9. После запуска
 - В Яндекс.Вебмастере и Google Search Console подтвердите домен, отправьте `sitemap.xml`.
@@ -105,4 +105,4 @@ sudo chown www-data:www-data /var/www/lead_config.php && sudo chmod 640 /var/www
 - Раз в месяц: `sudo apt update && sudo apt upgrade`, проверка `sudo certbot renew --dry-run`, свободное место `df -h`.
 
 ## 10. Обновление сайта позже
-Изменили файлы, снова `python tools/build_dist.py example.ru`, залили содержимое `dist` в `/var/www/aidir` поверх старых (права из шага 4), для скриптов и стилей при необходимости обновите версию в имени файла или сбросьте кэш (Ctrl+F5).
+Изменили файлы, снова `python tools/build_dist.py ai-dir.ru`, залили содержимое `dist` в `/var/www/aidir` поверх старых (права из шага 4), для скриптов и стилей при необходимости обновите версию в имени файла или сбросьте кэш (Ctrl+F5).
