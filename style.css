@@ -292,3 +292,14 @@ header{z-index:120}
 .prof-back h4{font-family:var(--disp);font-size:16px;line-height:1.25}
 .prof-back p{font-size:14.5px;line-height:1.55;color:var(--mut)}
 .prof-back .hint{margin-top:auto;font-size:12px;color:var(--ac)}
+
+/* Карточки профессий: на широких экранах все четыре в один ряд без прокрутки, аватарка в правом верхнем углу */
+.prof .front{position:relative}
+.prof-av{position:absolute;top:18px;right:18px;width:52px;height:52px;border-radius:50%;border:2px solid var(--ac);background:#170a35;box-shadow:0 0 18px #7c3aed55}
+.prof .front,.prof-back{min-height:300px}
+@media(min-width:640px){
+  .prof-head .sp-arrows{display:none}
+  #prof{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;overflow:visible;scroll-snap-type:none}
+  #prof .prof{flex:none;width:auto}
+}
+@media(min-width:1000px){#prof{grid-template-columns:repeat(4,minmax(0,1fr))}}
