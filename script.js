@@ -84,9 +84,9 @@ function loadAnalytics() {
 })();
 
 // Карточки спикеров: переворот по клику / Enter / пробелу
-document.addEventListener("click", function (e) { var c = e.target.closest(".flip"); if (c) c.classList.toggle("is-flipped"); });
+document.addEventListener("click", function (e) { var c = e.target.closest(".flip"); if (c) { c.classList.toggle("is-flipped"); c.setAttribute("aria-pressed", c.classList.contains("is-flipped") ? "true" : "false"); } });
 document.addEventListener("keydown", function (e) {
-  if ((e.key === "Enter" || e.key === " ") && e.target.classList && e.target.classList.contains("flip")) { e.preventDefault(); e.target.classList.toggle("is-flipped"); }
+  if ((e.key === "Enter" || e.key === " ") && e.target.classList && e.target.classList.contains("flip")) { e.preventDefault(); e.target.classList.toggle("is-flipped"); e.target.setAttribute("aria-pressed", e.target.classList.contains("is-flipped") ? "true" : "false"); }
 });
 
 // Планета в первом экране: вращающаяся Земля из точек (реальные материки, маска суши 1.5 градуса)

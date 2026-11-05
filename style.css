@@ -282,7 +282,13 @@ header{z-index:120}
 .f-btnwrap .f-res img{width:0;min-width:60%}
 .hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
 /* Слайдер профессий «Наш ответ работодателям» */
-.prof-card{flex:0 0 min(300px,82%);scroll-snap-align:start;display:flex;flex-direction:column;justify-content:space-between;gap:28px;min-height:190px}
 .prof-n{font-family:var(--disp);font-weight:900;font-size:38px;line-height:1;color:var(--ac)}
 .prof-tag{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ac-b);margin-bottom:8px}
-.prof-card h3{font-size:20px;line-height:1.25}
+.prof{flex:0 0 min(300px,82%);scroll-snap-align:start}
+.prof .front{min-height:270px;justify-content:space-between;gap:24px}
+.prof .front h3{font-size:20px;line-height:1.25}
+.prof .front .hint{margin-top:0;padding-top:0}
+.prof-back{min-height:270px;padding:22px;display:flex;flex-direction:column;gap:12px;background:var(--card);border-color:var(--ac)}
+.prof-back h4{font-family:var(--disp);font-size:16px;line-height:1.25}
+.prof-back p{font-size:14.5px;line-height:1.55;color:var(--mut)}
+.prof-back .hint{margin-top:auto;font-size:12px;color:var(--ac)}
