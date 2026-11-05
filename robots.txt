@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://example.ru/sitemap.xml
+Sitemap: https://ai-dir.ru/sitemap.xml

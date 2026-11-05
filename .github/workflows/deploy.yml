@@ -1,0 +1,39 @@
+name: Deploy to ai-dir.ru
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-ai-dir
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AI_DIR_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "195.209.210.90 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP5cU+lB+lRwd6eGexWTfaZ5MdC7eQGRf2UFiVse9L9L" > ~/.ssh/known_hosts
+
+      - name: Check that this is the site
+        run: test -f index.html
+
+      - name: Sync
+        run: |
+          rsync -az --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.gitignore' \
+            --exclude='.gitattributes' \
+            --exclude='.htaccess' \
+            ./ aidir-deploy@195.209.210.90:/
