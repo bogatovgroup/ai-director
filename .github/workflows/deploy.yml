@@ -36,4 +36,6 @@ jobs:
             --exclude='.gitignore' \
             --exclude='.gitattributes' \
             --exclude='.htaccess' \
-            --exclude='tools/' \n            --exclude='extras/' \n            ./ aidir-deploy@195.209.210.90:/
+            --exclude='tools/' \
+            --exclude='extras/' \
+            ./ aidir-deploy@195.209.210.90:/
