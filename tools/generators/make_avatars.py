@@ -2,14 +2,14 @@
 Берёт img/avatars/source/prof-1..4.(jpg|jpeg|png|webp), делает квадратный кадр (лицо в верхней части), 192x192 webp -> img/avatars/prof-N.webp.
 Требуется: pip install pillow. После запуска в index.html заменить src="img/avatars/prof-N.svg" на prof-N.webp (скрипт делает это сам с ключом --html)."""
 import os, re, sys
-from PIL import Image
+from PIL import Image, ImageStat
 
 # Кадры по лицам (left, top, right, bottom) в пикселях исходных фото; для остальных кадр берётся автоматически сверху.
 CROPS = {
-    1: (0, 30, 736, 766),       # prof-1: мужчина с седыми волосами (736x977)
-    2: (0, 300, 1080, 1380),    # prof-2: мужчина в очках (1080x1920)
-    3: (10, 30, 450, 470),      # prof-3: мужчина с бородой (474x711)
-    4: (265, 0, 465, 200),      # prof-4: женщина (643x360)
+    1: (-65, -25, 785, 825),      # prof-1: мужчина с седыми волосами (736x977), голова целиком
+    2: (-275, -75, 1355, 1555),   # prof-2: мужчина в очках (1080x1920)
+    3: (-27, 7, 498, 532),        # prof-3: мужчина с бородой (474x711)
+    4: (252, -18, 472, 202),      # prof-4: женщина (643x360)
 }
 
 src_dir = os.path.join("img", "avatars", "source")
@@ -33,8 +33,14 @@ for n in range(1, 5):
     if h > side:
         top = int((h - side) * 0.15)    # чуть ниже самого верха, чтобы не обрезать макушку
     box = CROPS.get(n)
-    if box and box[2] <= w and box[3] <= h:
-        im = im.crop(box).resize((192, 192), Image.LANCZOS)
+    if box:
+        l, t, r, b = box
+        side = r - l
+        edge = [im.crop((0, 0, w, 6)), im.crop((0, h - 6, w, h)), im.crop((0, 0, 6, h)), im.crop((w - 6, 0, w, h))]
+        fill = tuple(int(sum(ImageStat.Stat(e).median[i] for e in edge) / 4) for i in range(3))
+        canvas = Image.new("RGB", (side, side), fill)
+        canvas.paste(im, (-l, -t))          # части кадра за пределами фото заполняются цветом фона
+        im = canvas.resize((192, 192), Image.LANCZOS)
     else:
         im = im.crop((left, top, left + side, top + side)).resize((192, 192), Image.LANCZOS)
     out = os.path.join(out_dir, f"prof-{n}.webp")
