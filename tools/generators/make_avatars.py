@@ -4,6 +4,14 @@
 import os, re, sys
 from PIL import Image
 
+# Кадры по лицам (left, top, right, bottom) в пикселях исходных фото; для остальных кадр берётся автоматически сверху.
+CROPS = {
+    1: (0, 30, 736, 766),       # prof-1: мужчина с седыми волосами (736x977)
+    2: (0, 300, 1080, 1380),    # prof-2: мужчина в очках (1080x1920)
+    3: (10, 30, 450, 470),      # prof-3: мужчина с бородой (474x711)
+    4: (265, 0, 465, 200),      # prof-4: женщина (643x360)
+}
+
 src_dir = os.path.join("img", "avatars", "source")
 out_dir = os.path.join("img", "avatars")
 done = []
@@ -24,7 +32,11 @@ for n in range(1, 5):
     top = 0 if h > side else 0          # лицо обычно в верхней половине: берём верх кадра
     if h > side:
         top = int((h - side) * 0.15)    # чуть ниже самого верха, чтобы не обрезать макушку
-    im = im.crop((left, top, left + side, top + side)).resize((192, 192), Image.LANCZOS)
+    box = CROPS.get(n)
+    if box and box[2] <= w and box[3] <= h:
+        im = im.crop(box).resize((192, 192), Image.LANCZOS)
+    else:
+        im = im.crop((left, top, left + side, top + side)).resize((192, 192), Image.LANCZOS)
     out = os.path.join(out_dir, f"prof-{n}.webp")
     im.save(out, "WEBP", quality=82, method=6)
     print(out, os.path.getsize(out), "байт")
