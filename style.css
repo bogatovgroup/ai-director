@@ -310,3 +310,7 @@ header{z-index:120}
 .prof .front .prof-tag{margin-bottom:8px}
 .prof .front h3{min-height:75px}
 .prof .front .hint{margin-top:auto;padding-top:14px}
+/* Видео в блоке «Проблема»: исходно 9:16 (569 px при ширине 320); высота уменьшена вдвое (285 px), затем увеличена на 10% (314 px); кадр обрезается по краям, лицо остаётся в кадре */
+.prob-video video{aspect-ratio:auto;height:314px;object-fit:cover;object-position:center 28%}
+@media(max-width:900px) and (min-width:561px){.prob-video video{height:234px}}
+@media(max-width:560px){.prob-video video{height:234px}}
