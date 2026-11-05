@@ -247,3 +247,36 @@ document.addEventListener("keydown", function (e) {
   new MutationObserver(function () { setTimeout(clean, 0); }).observe(box, { childList: true, subtree: true });
   clean();
 })();
+
+// Сворачиваемые карточки («Пакет внедрения...», «Что вы будете уметь»): свёрнуты до половины полной высоты, стрелка внизу раскрывает до полной
+(function () {
+  var cards = document.querySelectorAll(".collapsible");
+  if (!cards.length) return;
+  function measure() {
+    cards.forEach(function (c) {
+      c.style.transition = "none"; c.style.maxHeight = "none";
+      var full = c.offsetHeight;
+      c.dataset.full = full;
+    });
+    var half = Math.max.apply(null, Array.prototype.map.call(cards, function (c) { return Math.round(c.dataset.full / 2); }));
+    cards.forEach(function (c) {
+      c.dataset.half = half;
+      c.style.maxHeight = (c.classList.contains("open") ? c.dataset.full : half) + "px";
+      void c.offsetHeight; c.style.transition = "";
+    });
+  }
+  cards.forEach(function (c) {
+    var b = c.querySelector(".expand");
+    b.addEventListener("click", function () {
+      var open = !c.classList.contains("open");
+      c.classList.toggle("open", open);
+      c.style.maxHeight = (open ? c.dataset.full : c.dataset.half) + "px";
+      b.setAttribute("aria-expanded", open ? "true" : "false");
+      b.setAttribute("aria-label", open ? "Свернуть" : "Развернуть");
+    });
+  });
+  measure();
+  window.addEventListener("load", measure);
+  var t; window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(measure, 150); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+})();
