@@ -20,7 +20,7 @@ base = "https://" + domain
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 dist = os.path.join(root, "dist")
 skip_dirs = {".git", "dist", "tools", "extras", "node_modules", "__pycache__"}
-skip_files = {".gitattributes", ".gitignore"}
+skip_files = {".gitattributes", ".gitignore", "start-preview.bat"}
 skip_ext = {".md", ".py", ".txt"}
 keep_txt = {"robots.txt"}
 
