@@ -8,8 +8,8 @@ from PIL import Image, ImageStat
 CROPS = {
     1: (-65, -25, 785, 825),      # prof-1: мужчина с седыми волосами (736x977), голова целиком
     2: (-275, -75, 1355, 1555),   # prof-2: мужчина в очках (1080x1920)
-    3: (-27, 7, 498, 532),        # prof-3: мужчина с бородой (474x711)
-    4: (252, -18, 472, 202),      # prof-4: женщина (643x360)
+    3: (-80, -45, 550, 585),      # prof-3: мужчина с бородой (474x711), лицо мельче (кадр шире на 20%)
+    4: (262, -8, 462, 192),       # prof-4: женщина (643x360), лицо крупнее на 10%
 }
 
 src_dir = os.path.join("img", "avatars", "source")
@@ -36,8 +36,9 @@ for n in range(1, 5):
     if box:
         l, t, r, b = box
         side = r - l
-        edge = [im.crop((0, 0, w, 6)), im.crop((0, h - 6, w, h)), im.crop((0, 0, 6, h)), im.crop((w - 6, 0, w, h))]
-        fill = tuple(int(sum(ImageStat.Stat(e).median[i] for e in edge) / 4) for i in range(3))
+        # цвет фона берём по верхней полоске (низ кадра часто занят одеждой и тёмный)
+        top_strip = im.crop((0, 0, w, 8))
+        fill = tuple(int(v) for v in ImageStat.Stat(top_strip).median)
         canvas = Image.new("RGB", (side, side), fill)
         canvas.paste(im, (-l, -t))          # части кадра за пределами фото заполняются цветом фона
         im = canvas.resize((192, 192), Image.LANCZOS)
