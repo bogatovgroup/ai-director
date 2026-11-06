@@ -190,9 +190,9 @@ document.addEventListener("keydown", function (e) {
       var k = Math.min(1, avail / W);
       inner.style.transform = "scale(" + k + ")";
       box.style.height = Math.round(H * k) + "px";
-      box.style.overflowX = "hidden";
+      box.style.overflowX = "hidden"; box.style.minHeight = "0";
     } else {
-      inner.style.transform = ""; box.style.height = ""; box.style.overflowX = "auto";
+      inner.style.transform = ""; box.style.height = ""; box.style.overflowX = "auto"; box.style.minHeight = "";
     }
   }
   fit(); window.addEventListener("resize", fit);
@@ -205,7 +205,7 @@ document.addEventListener("keydown", function (e) {
   var busy = false;
   function fmt() {
     if (busy) return; busy = true;
-    var w = document.createTreeWalker(box, NodeFilter.SHOW_TEXT, null), n;
+    var w = document.createTreeWalker(box, NodeFilter.SHOW_TEXT, { acceptNode: function (x) { return x.parentNode && x.parentNode.nodeName === "SCRIPT" ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT; } }), n;   // код виджета не трогаем
     while ((n = w.nextNode())) {
       var t = n.nodeValue;
       if (t.indexOf("\u20BD") === -1 && !/\d{4,}/.test(t)) continue;

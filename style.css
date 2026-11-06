@@ -139,7 +139,7 @@ footer .f-col .f-soc{margin:0 0 28px}
 .hh-widget{max-width:100%;overflow-x:auto;min-height:178px;display:flex;justify-content:center}
 .f-btnwrap .f-res img{width:0;min-width:50%}
 .hh-widget{justify-content:flex-start}
-.hh-widget{display:block;overflow-x:auto;overflow-y:hidden;min-height:0}
+.hh-widget{display:block;overflow-x:auto;overflow-y:hidden;min-height:178px}   /* место под виджет заранее: без сдвига страницы (CLS) */
 .hh-scale{width:1260px;transform-origin:left top}
 .f-btnwrap .f-res img{width:0;min-width:75%}
 .author-grid{align-items:stretch}
@@ -346,3 +346,10 @@ header{z-index:120}
 @media(min-width:900px){.about-grid{grid-template-columns:1fr 2fr}}
 @media(max-width:899px){.about-img img{max-width:420px;margin:0 auto}}
 @media(min-width:900px){.about-grid{grid-template-columns:2fr 3fr;align-items:stretch}.about-img{display:flex}.about-img img{height:100%;min-height:100%;object-position:center}}
+
+/* Телефоны и планшеты: поля ввода 16 px (iOS не увеличивает страницу при фокусе), крупные зоны нажатия в чек-листе */
+@media(max-width:1024px){input,select,textarea{font-size:16px}}
+.q label{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding-right:18px;cursor:pointer}
+.q input[type=radio]{width:20px;height:20px;accent-color:var(--ac)}
+/* Подзаголовок внутри H1: бренд AI-DIR и полное название программы (для поиска), визуально - мелкая строка под словом */
+.h1-sub{display:block;margin-top:14px;font-family:var(--sans);font-size:clamp(14px,1.6vw,18px);font-weight:600;letter-spacing:.04em;line-height:1.3;-webkit-text-fill-color:var(--ac-b);color:var(--ac-b)}
