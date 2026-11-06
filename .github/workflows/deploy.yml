@@ -28,6 +28,9 @@ jobs:
       - name: Check that this is the site
         run: test -f index.html
 
+      - name: Build (canonical, og, JSON-LD, domain in sitemap)
+        run: python3 tools/build_dist.py ai-dir.ru && test -f dist/index.html
+
       - name: Sync
         run: |
           rsync -az --delete \
@@ -38,4 +41,4 @@ jobs:
             --exclude='.htaccess' \
             --exclude='tools/' \
             --exclude='extras/' \
-            ./ aidir-deploy@195.209.210.90:/
+            dist/ aidir-deploy@195.209.210.90:/
