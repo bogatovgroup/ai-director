@@ -34,11 +34,5 @@ jobs:
       - name: Sync
         run: |
           rsync -az --delete \
-            --exclude='.git/' \
-            --exclude='.github/' \
-            --exclude='.gitignore' \
-            --exclude='.gitattributes' \
             --exclude='.htaccess' \
-            --exclude='tools/' \
-            --exclude='extras/' \
             dist/ aidir-deploy@195.209.210.90:/
