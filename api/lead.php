@@ -15,18 +15,12 @@
 
 declare(strict_types=1);
 header('Content-Type: application/json; charset=utf-8');
-header('X-Content-Type-Options: nosniff');
 header('Cache-Control: no-store');
 
 function out(int $code, array $data): void {
     http_response_code($code);
     echo json_encode($data, JSON_UNESCAPED_UNICODE);
     exit;
-}
-
-if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
-    header('Allow: POST');
-    out(405, ['ok' => false, 'error' => 'method_not_allowed']);
 }
 
 // ---- Настройки ----
@@ -44,30 +38,83 @@ if (is_file($file)) {
     if (is_array($c)) { $cfg = array_merge($cfg, $c); }
 }
 
-// ---- Проверка источника запроса (простая защита от чужих форм) ----
+// ---- Проверка источника запроса (защита от чужих форм): Origin или Referer обязателен и должен быть с нашего домена ----
 $host = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
-$allowed = $cfg['allowed_hosts'] ?: [$host];
+$allowed = array_map('strtolower', $cfg['allowed_hosts'] ?: [$host]);
+$oh = '';
 foreach (['HTTP_ORIGIN', 'HTTP_REFERER'] as $h) {
     if (!empty($_SERVER[$h])) {
         $oh = strtolower((string)parse_url((string)$_SERVER[$h], PHP_URL_HOST));
-        if ($oh !== '' && !in_array($oh, array_map('strtolower', $allowed), true)) {
-            out(403, ['ok' => false, 'error' => 'bad_origin']);
-        }
+        break;
     }
 }
+if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'GET' && ($oh === '' || !in_array($oh, $allowed, true))) {
+    out(403, ['ok' => false, 'error' => 'bad_origin']);
+}
 
-// ---- Ограничение частоты: не больше 5 заявок в час с одного адреса ----
 $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
 $logDir = $cfg['log_dir'] ?: sys_get_temp_dir() . '/aidir_leads';
 if (!is_dir($logDir)) { @mkdir($logDir, 0700, true); }
-$rateFile = $logDir . '/rate_' . md5($ip) . '.json';
+if (!is_dir($logDir . '/tok')) { @mkdir($logDir . '/tok', 0700, true); }
 $now = time();
+
+// Редкая уборка: служебные файлы старше 2 часов (лимиты по IP и использованные токены) не копятся
+if (mt_rand(1, 40) === 1) {
+    foreach (array_merge(glob($logDir . '/rate_*.json') ?: [], glob($logDir . '/tok/*') ?: []) as $f) {
+        if (@filemtime($f) < $now - 7200) { @unlink($f); }
+    }
+}
+
+// ---- Одноразовый токен формы: выдаётся при загрузке страницы (GET ?t=1), живёт от 3 секунд до 2 часов ----
+function secret_key(array $cfg, string $logDir): string {
+    if (!empty($cfg['hmac_secret'])) { return (string)$cfg['hmac_secret']; }
+    $f = $logDir . '/.secret';
+    $k = is_file($f) ? trim((string)file_get_contents($f)) : '';
+    if (strlen($k) < 32) {
+        $k = bin2hex(random_bytes(32));
+        @file_put_contents($f, $k, LOCK_EX);
+        if (@chmod($f, 0600) === false && !is_file($f)) {   // нет записи в каталог: ключ из настроек сервера
+            return hash('sha256', ($cfg['smtp_pass'] ?? '') . ($cfg['bitrix_webhook'] ?? '') . __DIR__ . php_uname());
+        }
+    }
+    return $k;
+}
+function make_token(string $key, int $ts): string {
+    $n = bin2hex(random_bytes(8));
+    return $ts . '.' . $n . '.' . hash_hmac('sha256', $ts . '.' . $n, $key);
+}
+function check_token(string $key, string $tok, int $now, string $logDir): bool {
+    $p = explode('.', $tok);
+    if (count($p) !== 3 || !ctype_digit($p[0]) || !ctype_xdigit($p[1])) { return false; }
+    if (!hash_equals(hash_hmac('sha256', $p[0] . '.' . $p[1], $key), $p[2])) { return false; }
+    $age = $now - (int)$p[0];
+    if ($age < 3 || $age > 7200) { return false; }
+    $mark = $logDir . '/tok/' . hash('sha256', $tok);
+    if (is_file($mark)) { return false; }              // повторное использование
+    return @file_put_contents($mark, '1', LOCK_EX) !== false;
+}
+
+$method = (string)($_SERVER['REQUEST_METHOD'] ?? '');
+if ($method === 'GET' && isset($_GET['t'])) {
+    out(200, ['ok' => true, 'token' => make_token(secret_key($cfg, $logDir), $now)]);
+}
+if ($method !== 'POST') {
+    header('Allow: POST, GET');
+    out(405, ['ok' => false, 'error' => 'method_not_allowed']);
+}
+
+// ---- Ограничение частоты: не больше 5 заявок в час с одного адреса и 60 в час со всех вместе ----
+$rateFile = $logDir . '/rate_' . md5($ip) . '.json';
 $hits = [];
 if (is_file($rateFile)) {
     $hits = json_decode((string)file_get_contents($rateFile), true) ?: [];
     $hits = array_values(array_filter($hits, fn($t) => $t > $now - 3600));
 }
 if (count($hits) >= 5) { out(429, ['ok' => false, 'error' => 'rate_limited']); }
+$globFile = $logDir . '/rate_global.json';
+$glob = is_file($globFile) ? (json_decode((string)file_get_contents($globFile), true) ?: []) : [];
+$glob = array_values(array_filter($glob, fn($t) => $t > $now - 3600));
+if (count($glob) >= 60) { out(429, ['ok' => false, 'error' => 'rate_limited']); }
 
 // Минимальный SMTP-клиент без сторонних библиотек: SSL (порт 465) или STARTTLS (587), авторизация LOGIN
 function smtp_send(array $c, string $to, string $subject, string $body, string $from, string $replyTo): bool {
@@ -133,6 +180,10 @@ function field(string $k, int $max): string {
 // Ловушка для ботов: поле скрыто от людей. Если заполнено, делаем вид, что всё хорошо, но ничего не отправляем.
 if (field('website', 200) !== '') { out(200, ['ok' => true]); }
 
+if (!check_token(secret_key($cfg, $logDir), field('token', 200), $now, $logDir)) {
+    out(403, ['ok' => false, 'error' => 'bad_token']);
+}
+
 $name = field('name', 100);
 $email = field('email', 150);
 $contact = field('contact', 120);
@@ -174,6 +225,11 @@ $lead = [
 // ---- 1) Журнал (JSON Lines). Главное хранилище: заявка не должна потеряться ----
 $hits[] = $now;
 @file_put_contents($rateFile, json_encode($hits), LOCK_EX);
+$glob[] = $now;
+@file_put_contents($globFile, json_encode($glob), LOCK_EX);
+if (is_file($logDir . '/leads.jsonl') && filesize($logDir . '/leads.jsonl') > 20 * 1024 * 1024) {
+    @rename($logDir . '/leads.jsonl', $logDir . '/leads-' . date('Ymd-His') . '.jsonl');   // журнал не растёт бесконечно
+}
 $saved = @file_put_contents($logDir . '/leads.jsonl', json_encode($lead, JSON_UNESCAPED_UNICODE) . "\n", FILE_APPEND | LOCK_EX) !== false;
 
 // ---- 2) Письмо на почту ----

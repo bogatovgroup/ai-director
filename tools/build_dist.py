@@ -22,7 +22,7 @@ dist = os.path.join(root, "dist")
 skip_dirs = {".git", "dist", "tools", "extras", "node_modules", "__pycache__"}
 skip_files = {".gitattributes", ".gitignore", "start-preview.bat"}
 skip_ext = {".md", ".py", ".txt"}
-keep_txt = {"robots.txt"}
+keep_txt = {"robots.txt", "security.txt"}
 
 if os.path.isdir(dist):
     shutil.rmtree(dist)
@@ -61,3 +61,18 @@ rw("documents.html", lambda s: s.replace("<title>", f'<link rel="canonical" href
 size = sum(os.path.getsize(os.path.join(d, f)) for d, _, fs in os.walk(dist) for f in fs)
 print(f"Готово: {dist}  ({size/1024/1024:.1f} МБ)\nДомен в файлах: {base}")
 print("\nПроверьте вручную:\n - заполнены ли вставки [ВСТАВИТЬ] в legal/*.html (grep -r ВСТАВИТЬ dist)\n - лежит ли lead_config.php выше корня сайта (инструкция в api/lead.php)\n - работает ли отправка формы на хостинге (PHP 8+, функция mail() или SMTP)")
+
+# Версии CSS/JS в адресах (?v=хэш): браузеры (Safari) не держат старый стиль после обновления сайта
+import hashlib
+def _ver(rel):
+    return hashlib.md5(open(os.path.join(dist, rel), "rb").read()).hexdigest()[:8]
+_ref = re.compile(r'(href|src)="((?:\.\./)?)([\w.-]+\.(?:css|js))"')
+for dp, dn, fn in os.walk(dist):
+    for f in fn:
+        if not f.endswith(".html"):
+            continue
+        p = os.path.join(dp, f)
+        s = open(p, encoding="utf-8").read()
+        s2 = _ref.sub(lambda m: f'{m.group(1)}="{m.group(2)}{m.group(3)}?v={_ver(m.group(3))}"', s)
+        if s2 != s:
+            open(p, "w", encoding="utf-8", newline="\n").write(s2)

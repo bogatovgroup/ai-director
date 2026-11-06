@@ -1,0 +1,4 @@
+Contact: mailto:info@aiskolkovo.ru
+Expires: 2027-11-06T00:00:00.000Z
+Preferred-Languages: ru, en
+Canonical: https://ai-dir.ru/.well-known/security.txt

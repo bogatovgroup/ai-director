@@ -5,6 +5,12 @@ const MAIL = "info@aiskolkovo.ru";
 const who = document.getElementById("who"), company = document.getElementById("company");
 who.addEventListener("change", () => { const c = who.value === "компанию"; company.style.display = c ? "" : "none"; company.required = c; });
 
+// Одноразовый токен формы (защита от ботов): берётся с сервера при загрузке и перед отправкой, действует от 3 секунд
+let leadTok = "", leadTokAt = 0;
+const loadTok = () => fetch(document.querySelector("form.lead-form").getAttribute("action") + "?t=1", { cache: "no-store" })
+  .then(r => r.json()).then(j => { leadTok = (j && j.token) || ""; leadTokAt = Date.now(); }).catch(() => { leadTok = ""; });
+loadTok();
+
 document.querySelector("form.lead-form").addEventListener("submit", async e => {
   e.preventDefault();
   const f = e.target, m = f.querySelector(".msg"), btn = f.querySelector("button"), q = new URLSearchParams(location.search);
@@ -20,11 +26,16 @@ document.querySelector("form.lead-form").addEventListener("submit", async e => {
   };
   if (btn) btn.disabled = true;
   try {
+    if (!leadTok) { await loadTok(); }
+    const wait = 3200 - (Date.now() - leadTokAt);
+    if (wait > 0) { await new Promise(res => setTimeout(res, wait)); }
     const body = new FormData(f);
+    body.append("token", leadTok);
     ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"].forEach(k => { if (q.get(k)) body.append(k, q.get(k)); });
     const r = await fetch(f.getAttribute("action"), { method: "POST", body, headers: { "Accept": "application/json" } });
     const res = r.ok ? await r.json().catch(() => null) : null;
-    if (!res || !res.ok) throw 0;
+    leadTok = "";
+    if (!res || !res.ok) { loadTok(); throw 0; }
     m.textContent = "Спасибо! Заявка отправлена, мы скоро свяжемся с вами."; f.reset();
     company.style.display = "none"; company.required = false;
   } catch (err) { fallback(); }
