@@ -353,3 +353,10 @@ header{z-index:120}
 .q input[type=radio]{width:20px;height:20px;accent-color:var(--ac)}
 /* Подзаголовок внутри H1: бренд AI-DIR и полное название программы (для поиска), визуально - мелкая строка под словом */
 .h1-sub{display:block;margin-top:14px;font-family:var(--sans);font-size:clamp(14px,1.6vw,18px);font-weight:600;letter-spacing:.04em;line-height:1.3;-webkit-text-fill-color:var(--ac-b);color:var(--ac-b)}
+
+.f-res.f-res-top{margin:0 0 22px;display:block}.f-res.f-res-top img{width:120px;min-width:0}
+footer .f-col .f-btnwrap .f-soc-b{margin:24px 0 0}
+@media(min-width:900px){
+.about-img{overflow:hidden;border-radius:18px;border:1px solid var(--ac);box-shadow:0 0 40px #7c3aed44}
+.about-img img{border:0;border-radius:0;box-shadow:none;object-position:69% 35%;transform-origin:69% 38%;transform:translateX(-3%) scale(1.11)}
+}
