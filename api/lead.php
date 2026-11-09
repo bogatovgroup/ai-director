@@ -3,7 +3,7 @@
 // Секреты хранятся ТОЛЬКО на сервере, вне папки сайта: файл lead_config.php (на уровень выше корня сайта) или переменные окружения.
 // Пример lead_config.php:
 //   <?php return [
-//     'mail_to'        => 'info@aiskolkovo.ru',
+//     'mail_to'        => 'aidir@aiskolkovo.ru',
 //     'mail_from'      => 'no-reply@ВАШ-ДОМЕН.ru',
 //     'bitrix_webhook' => 'https://ВАШ.bitrix24.ru/rest/1/КОД/crm.lead.add.json', // права вебхука: только crm.lead.add
 //     'log_dir'        => '/var/lib/aidir-leads',   // вне папки сайта, права 700, владелец - пользователь PHP-FPM
@@ -25,7 +25,7 @@ function out(int $code, array $data): void {
 
 // ---- Настройки ----
 $cfg = [
-    'mail_to' => getenv('LEAD_MAIL_TO') ?: 'info@aiskolkovo.ru',
+    'mail_to' => getenv('LEAD_MAIL_TO') ?: 'aidir@aiskolkovo.ru',
     'mail_from' => getenv('LEAD_MAIL_FROM') ?: '',
     'bitrix_webhook' => getenv('LEAD_BITRIX_WEBHOOK') ?: '',
     'log_dir' => getenv('LEAD_LOG_DIR') ?: '',
@@ -37,6 +37,8 @@ if (is_file($file)) {
     $c = include $file;
     if (is_array($c)) { $cfg = array_merge($cfg, $c); }
 }
+// Старый адрес получателя заявок в настройках сервера заменяем на новый
+if (strtolower(trim((string)$cfg['mail_to'])) === 'info@aiskolkovo.ru') { $cfg['mail_to'] = 'aidir@aiskolkovo.ru'; }
 
 // ---- Проверка источника запроса (защита от чужих форм): Origin или Referer обязателен и должен быть с нашего домена ----
 $host = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
