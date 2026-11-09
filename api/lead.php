@@ -234,6 +234,17 @@ if (is_file($logDir . '/leads.jsonl') && filesize($logDir . '/leads.jsonl') > 20
 }
 $saved = @file_put_contents($logDir . '/leads.jsonl', json_encode($lead, JSON_UNESCAPED_UNICODE) . "\n", FILE_APPEND | LOCK_EX) !== false;
 
+// Заявка уже записана: сразу отвечаем посетителю, а письмо и CRM отправляем уже после ответа (иначе страница ждёт SMTP и Битрикс)
+$early = false;
+if ($saved && function_exists('fastcgi_finish_request')) {
+    ignore_user_abort(true);
+    @set_time_limit(60);
+    http_response_code(200);
+    echo json_encode(['ok' => true]);
+    fastcgi_finish_request();
+    $early = true;
+}
+
 // ---- 2) Письмо на почту ----
 $mailed = false;
 if ($cfg['mail_to'] !== '') {
@@ -283,6 +294,7 @@ if ($cfg['bitrix_webhook'] !== '' && function_exists('curl_init')) {
     curl_close($ch);
 }
 
+if ($early) { exit; }
 // Если не удалось ни записать, ни отправить письмо: сообщаем, чтобы страница предложила запасной вариант
 if (!$saved && !$mailed) { out(500, ['ok' => false, 'error' => 'storage_failed']); }
 out(200, ['ok' => true]);
