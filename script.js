@@ -1,6 +1,6 @@
 // Приём заявок: форма отправляется на серверный обработчик api/lead.php (он пишет заявку, шлёт письмо и при необходимости передаёт в Битрикс24).
 // Секреты (вебхук Битрикс24) хранятся только на сервере. Если сервера нет или он не ответил, открывается запасной вариант: письмо (mailto).
-const MAIL = "info@aiskolkovo.ru";
+const MAIL = "aidir@aiskolkovo.ru";
 
 const who = document.getElementById("who"), company = document.getElementById("company");
 who.addEventListener("change", () => { const c = who.value === "компанию"; company.style.display = c ? "" : "none"; company.required = c; });
@@ -38,6 +38,7 @@ document.querySelector("form.lead-form").addEventListener("submit", async e => {
     if (!res || !res.ok) { loadTok(); throw 0; }
     m.textContent = "Спасибо! Заявка отправлена, мы скоро свяжемся с вами."; f.reset();
     company.style.display = "none"; company.required = false;
+    const td = document.getElementById("thanksDialog"); if (td && td.showModal) { td.showModal(); }
   } catch (err) { fallback(); }
   if (btn) btn.disabled = false;
 });
@@ -281,4 +282,12 @@ document.addEventListener("keydown", function (e) {
   window.addEventListener("load", measure);
   var t; window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(measure, 150); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+})();
+
+// Окно «Благодарим за регистрацию» после успешной отправки заявки
+(function () {
+  var d = document.getElementById("thanksDialog");
+  if (!d) return;
+  d.querySelector(".x").addEventListener("click", function () { d.close(); });
+  d.addEventListener("click", function (e) { if (e.target === d) d.close(); });
 })();

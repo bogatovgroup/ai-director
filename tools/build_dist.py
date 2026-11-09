@@ -54,7 +54,7 @@ _faq_html = re.search(r'<section id="faq".*?</section>', _src, re.S)
 _faq = [{"@type": "Question", "name": _txt(q), "acceptedAnswer": {"@type": "Answer", "text": _txt(a)}}
         for q, a in re.findall(r"<summary>(.*?)</summary>(.*?)</details>", _faq_html.group(0) if _faq_html else "", re.S)]
 _org = {"@type": "Organization", "@id": base + "/#org", "name": "АО «Ай Ти Сфера»", "url": base + "/",
-        "email": "info@aiskolkovo.ru", "logo": base + "/favicon-192.png"}
+        "email": "aidir@aiskolkovo.ru", "logo": base + "/favicon-192.png"}
 _offer = lambda name, price: {"@type": "Offer", "name": name, "price": price, "priceCurrency": "RUB",
                               "url": base + "/#tariffs", "availability": "https://schema.org/InStock", "category": "Paid"}
 _graph = [
