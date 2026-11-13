@@ -11,7 +11,7 @@ const SESS_DIR    = PRIVATE_DIR . '/sessions';
 const RATE_DIR    = PRIVATE_DIR . '/ratelimit';
 const COOKIE      = 'rzs';
 const IDLE_SEC    = 3 * 3600;   // бездействие 3 часа закрывает сеанс
-const MAX_FAILS   = 5;          // неверных попыток
+const MAX_FAILS   = 10;         // неверных попыток
 const LOCK_SEC    = 15 * 60;    // блокировка по IP на 15 минут
 
 $docroot = dirname(__DIR__);                 // /var/www/ai-dir.ru
@@ -121,7 +121,7 @@ if (($_SERVER['RZ_MODE'] ?? '') === 'login') {
             }
             $st['fails'] = (int)$st['fails'] + 1;
             if ($st['fails'] >= MAX_FAILS) { $st = ['fails' => 0, 'until' => $now + LOCK_SEC]; $msg = 'Слишком много попыток. Повторите через 15 мин.'; }
-            else { $msg = 'Неверный логин или пароль.'; }
+            else { $msg = 'Неверный логин или пароль. Введите заново. Осталось попыток: ' . (MAX_FAILS - $st['fails']) . '.'; }
         }
         ftruncate($fh, 0); rewind($fh); fwrite($fh, json_encode($st)); flock($fh, LOCK_UN); fclose($fh);
     } else { http_response_code(405); exit; }
