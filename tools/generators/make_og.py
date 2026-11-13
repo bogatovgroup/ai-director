@@ -3,7 +3,7 @@
 import math, os, random
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
-DATE_TEXT = "Старт 13.11.2026, 19:00 МСК"
+DATE_TEXT = "Старт 20.11.2026, 19:00 МСК"
 W, H = 1200, 630
 
 bg = Image.new("RGB", (W, H), (5, 0, 8))
