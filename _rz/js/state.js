@@ -70,8 +70,9 @@ $('btn-stop').onclick = async () => {
 };
 // Участники, пришедшие по публичной ссылке /join: подтягиваем с сервера в список админа
 const JoinSync = {
-  async pull() {
-    if (S.stage !== 'collect') return;
+  async pull(force) { // force: из «Скачать», когда локальный список пуст, а на сервере уже есть участники
+    if (S.stage !== 'collect' && !(force && !S.people.length && S.stage !== 'drawing')) return;
+    const wasCollect = S.stage === 'collect';
     try {
       const r = await fetch(new URL('__list', location.href), { cache: 'no-store', credentials: 'same-origin' });
       if (!r.ok) return;
@@ -83,7 +84,7 @@ const JoinSync = {
         Participants.add(S, String(p.name), raw);
         const me = S.people[S.people.length - 1]; Log.add(S, 'добавление по ссылке /join', '№' + me.n + ' ' + me.nick); added++;
       }
-      if (added) { save(); render(); tickTimer(); }
+      if (added) { if (!wasCollect) { S.stage = 'collect'; Log.add(S, 'синхронизация', 'список подтянут с сервера при скачивании'); } save(); render(); tickTimer(); }
     } catch (e) { /* сеть или сервер недоступны: список админа остаётся как есть */ }
   },
   live(data) { // ход розыгрыша для публичной страницы /join
@@ -108,7 +109,7 @@ $('btn-reset').onclick = () => { // двойное нажатие: обнуля�
   Log.add(S, 'сброс победителей', 'было победителей: ' + S.winners.length);
   S.winners = []; newRound(); save(); render();
 };
-$('btn-download').onclick = () => Export.download(S);
+$('btn-download').onclick = async () => { if (!S.people.length) await JoinSync.pull(true); Export.download(S); };
 $('btn-admin').onclick = () => { $('admin').hidden = !$('admin').hidden; };
 $('btn-new').onclick = () => { S.stage = 'closed'; save(); render(); };
 
