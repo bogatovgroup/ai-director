@@ -23,13 +23,13 @@ function render() {
     const r = document.createElement('div'); r.className = 'row slot'; r.innerHTML = '<span class="n"></span><span class="nm"></span><span class="nk"></span>'; r.children[0].textContent = i; list.appendChild(r);
   }
   $('empty').hidden = true;
-  $('count').textContent = S.people.length;
+  $('count').textContent = S.people.length; $('cap').textContent = S.people.length > 40 ? 60 : 40;
   $('prize').value = S.prize;
   const st = S.stage, active = Participants.active(S).length;
   $('form-box').hidden = st !== 'collect';
   $('big').hidden = st === 'collect'; $('form-box').classList.toggle('xl', st === 'collect'); // до «Старт» на месте крупных цифр - крупные поля ввода
-  $('btn-stop').hidden = st !== 'collect'; $('btn-stop').disabled = S.people.length < 2;
-  $('btn-open').hidden = st !== 'closed';
+  $('btn-stop').hidden = !(st === 'collect' && S.opened); $('btn-stop').disabled = S.people.length < 2;
+  $('btn-open').hidden = !(st === 'closed' || (st === 'collect' && !S.opened));
   $('btn-start').hidden = st !== 'closed'; $('btn-start').disabled = active < 1;
   $('hash').hidden = st === 'collect' || !S.hash; $('hash').textContent = 'Контрольная сумма списка: ' + (S.hash || '').slice(0, 12);
   $('btn-new').hidden = st !== 'done' || !!S.pending;
@@ -60,7 +60,7 @@ function collectTime() {
   return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
 }
 function tickTimer() {
-  if (S.stage !== 'collect') return;
+  if (S.stage !== 'collect' || !S.opened) return;
   if (S.people.length && !S.collectStart) { S.collectStart = Date.now(); save(); }
   $('btn-stop').textContent = 'Закрыть набор ' + collectTime();
 }
@@ -100,7 +100,7 @@ setInterval(() => JoinSync.pull(), 3000);
 function newRound() { // исходное состояние: пустой список и поля ввода участников
   if (S.people.length) S.lastRound = { people: S.people, hash: S.hash, at: Date.now() }; // чтобы «Скачать» отдавал список и после сброса
   S.people = []; S.hash = null; S.pending = null; S.drawWinner = null; S.collectStart = null; S.stage = 'collect';
-  JoinSync.ctl('reset');
+  S.opened = false; JoinSync.ctl('reset').then(() => JoinSync.ctl('close')); // новый набор: ссылка /join закрыта, пока не нажато «Открыть набор»
   $('error').textContent = ''; $('error').className = 'error'; $('form').reset();
 }
 let resetT;
@@ -114,7 +114,7 @@ $('btn-reset').onclick = () => { // двойное нажатие: обнуля�
 $('btn-download').onclick = async () => { if (!S.people.length) await JoinSync.pull(true); Export.download(S); };
 $('btn-admin').onclick = () => { $('admin').hidden = !$('admin').hidden; };
 $('btn-open').onclick = async () => { // вернуть набор: участники снова могут записываться
-  await JoinSync.ctl('open'); S.stage = 'collect'; S.hash = null; S.collectStart = Date.now(); Log.add(S, 'набор открыт снова', 'участников: ' + S.people.length); save(); render(); tickTimer();
+  await JoinSync.ctl('open'); S.stage = 'collect'; S.opened = true; S.hash = null; S.collectStart = Date.now(); Log.add(S, 'набор открыт', 'участников: ' + S.people.length); save(); render(); tickTimer();
 };
 $('btn-new').onclick = () => { S.stage = 'closed'; save(); render(); };
 

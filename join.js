@@ -9,7 +9,7 @@
   buildRows(40);
   var prevCount = null;
   function setPeople(ps) {
-    $('cnt').textContent = ps.length;
+    $('cnt').textContent = ps.length; $('cap').textContent = ps.length > 40 ? 60 : 40;
     var total = Math.max(40, ps.length); if (list.children.length !== total) buildRows(total);
     for (var k = 0; k < list.children.length; k++) {
       var p = ps[k], row = list.children[k];
@@ -25,14 +25,14 @@
     }
     prevCount = ps.length;
   }
-  var lastKey = '', timer = null, joined = false;
+  var lastKey = '', timer = null, joined = false, busy = false;
+  function updForm() { $('form-box').hidden = busy || joined || !$('closed').hidden; }
   function applyLive(lv) {
     var ph = (lv && lv.phase) || 'idle', key = ph + '|' + (lv && lv.n) + '|' + (lv && lv.color);
     if (key === lastKey) return; lastKey = key;
     var big = $('big'), rows = list.children, k;
     for (k = 0; k < rows.length; k++) rows[k].classList.remove('flash', 'blink3', 'final');
-    var busy = ph !== 'idle';
-    $('form-box').hidden = busy || joined || $('closed').hidden === false;
+    busy = ph !== 'idle'; updForm();
     $('big').hidden = !busy;
     $('winner').hidden = ph !== 'win';
     if (!busy) { big.classList.remove('on'); big.textContent = ''; return; }
@@ -43,14 +43,14 @@
   }
   function pull() {
     return fetch('/join-api', { cache: 'no-store', credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (d) {
-      if (d && d.open === false) setClosed(true);
+      if (d && typeof d.open === 'boolean') setClosed(!d.open);
       if (d && d.people) setPeople(d.people);
       applyLive(d && d.live);
       clearTimeout(timer); timer = setTimeout(pull, d && d.live && d.live.phase === 'run' ? 400 : 1500);
     }).catch(function () { clearTimeout(timer); timer = setTimeout(pull, 3000); });
   }
   function show(el, on) { el.hidden = !on; }
-  function setClosed(c) { show($('closed'), c); show($('form-box'), !c); }
+  function setClosed(c) { show($('closed'), c); updForm(); }
   pull();
   form.addEventListener('submit', function (e) {
     e.preventDefault(); err.textContent = '';
@@ -66,7 +66,7 @@
     }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d, s: r.status }; }); })
       .then(function (x) {
         if (x.ok && x.d.ok) {
-          joined = true; show($('form-box'), false); var m = $('done');
+          joined = true; updForm(); var m = $('done');
           m.textContent = 'Вы в списке участников! ' + (x.d.n ? 'Ваш номер: №' + x.d.n + '. ' : '') + 'Следите за эфиром.';
           show(m, true);
           pull();
