@@ -27,7 +27,7 @@ button.icon{padding:10px 14px}
 .prize input{flex:1;max-width:720px;background:transparent;border:0;border-bottom:1px dashed var(--line);color:var(--ac-b);font-weight:700;font-size:32px;padding:4px 2px}
 .layout{flex:1;display:grid;grid-template-columns:2fr 1fr;gap:20px;padding:20px 24px;min-height:0}
 .list-wrap{position:relative;min-height:0}
-.list{display:grid;grid-auto-flow:column;grid-template-rows:repeat(30,1fr);grid-template-columns:repeat(2,1fr);gap:3px 14px;height:100%}
+.list{display:grid;grid-auto-flow:column;grid-template-rows:repeat(var(--rows,20),1fr);grid-template-columns:repeat(2,1fr);gap:3px 14px;height:100%}
 .row{display:flex;gap:8px;align-items:center;padding:0 10px;border-radius:7px;font-size:clamp(10px,1.45vh,15px);
   border:1px solid transparent;background:#ffffff08;white-space:nowrap;overflow:hidden;transition:box-shadow .05s,background .05s}
 .row .n{width:2.2em;color:var(--muted);text-align:right}
@@ -83,7 +83,7 @@ button.link{border:0;padding:0;background:none;box-shadow:none;font-weight:400;c
   .prize input{max-width:none;min-width:0;border:0;font-size:26px;padding:2px}
   /* две колонки имён + третья служебная колонка с кнопками */
   .layout{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,3fr);gap:6px;padding:8px 10px;flex:1;min-height:0;overflow:hidden}
-  .list{grid-template-rows:repeat(30,1fr);grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 4px;height:100%}
+  .list{grid-template-rows:repeat(var(--rows,20),1fr);grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 4px;height:100%}
   .row{font-size:8px;padding:0 3px;gap:3px;border-radius:5px;min-height:0}
   .row .n{width:1.5em;flex:none}.row .nm{flex:1 1 0;min-width:0}.row .nk{display:block;flex:0 1 48%;min-width:0;margin-left:0;text-align:right}
   .panel{gap:6px;overflow:auto;min-height:0}
@@ -127,3 +127,6 @@ button.confirm{background:linear-gradient(135deg,#34e27a,#12a150);box-shadow:0 0
 
 .join-hint{margin:0 0 min(1.4vh,12px);color:var(--ac-b);font-size:clamp(12px,1.9vh,20px)}.join-hint b{color:#fff}
 @media (max-width:760px){.join-hint{font-size:10px;margin-bottom:4px}}
+
+/* карточка ввода справа вверху меньше на 30% (на ПК) */
+@media (min-width:761px){.box.xl{zoom:.7}}

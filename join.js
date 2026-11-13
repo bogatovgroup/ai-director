@@ -2,10 +2,15 @@
   var $ = function (i) { return document.getElementById(i); };
   var form = $('jf'), err = $('err'), go = $('go');
   var list = $('list');
-  for (var i = 1; i <= 60; i++) { var r = document.createElement('div'); r.className = 'row slot'; r.innerHTML = '<span class="n"></span><span class="nm"></span><span class="nk"></span>'; r.children[0].textContent = i; list.appendChild(r); }
+  function buildRows(total) {
+    list.innerHTML = ''; list.style.setProperty('--rows', total > 40 ? 30 : 20);
+    for (var i = 1; i <= total; i++) { var r = document.createElement('div'); r.className = 'row slot'; r.innerHTML = '<span class="n"></span><span class="nm"></span><span class="nk"></span>'; r.children[0].textContent = i; list.appendChild(r); }
+  }
+  buildRows(40);
   var prevCount = null;
   function setPeople(ps) {
     $('cnt').textContent = ps.length;
+    var total = Math.max(40, ps.length); if (list.children.length !== total) buildRows(total);
     for (var k = 0; k < list.children.length; k++) {
       var p = ps[k], row = list.children[k];
       row.classList.toggle('slot', !p);

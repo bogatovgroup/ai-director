@@ -18,7 +18,8 @@ function render() {
     if (S.stage === 'collect') { r.title = 'Клик — удалить'; r.style.cursor = 'pointer'; r.onclick = () => { Log.add(S, 'удаление', '№' + p.n + ' ' + p.nick); Participants.remove(S, p.n); save(); render(); }; }
     list.appendChild(r);
   });
-  for (let i = S.people.length + 1; i <= MAX; i++) {
+  const total = Math.max(40, S.people.length); list.style.setProperty('--rows', total > 40 ? 30 : 20); // на старте 20 + 20 мест
+  for (let i = S.people.length + 1; i <= total; i++) {
     const r = document.createElement('div'); r.className = 'row slot'; r.innerHTML = '<span class="n"></span><span class="nm"></span><span class="nk"></span>'; r.children[0].textContent = i; list.appendChild(r);
   }
   $('empty').hidden = true;
@@ -28,6 +29,7 @@ function render() {
   $('form-box').hidden = st !== 'collect';
   $('big').hidden = st === 'collect'; $('form-box').classList.toggle('xl', st === 'collect'); // до «Старт» на месте крупных цифр - крупные поля ввода
   $('btn-stop').hidden = st !== 'collect'; $('btn-stop').disabled = S.people.length < 2;
+  $('btn-open').hidden = st !== 'closed';
   $('btn-start').hidden = st !== 'closed'; $('btn-start').disabled = active < 1;
   $('hash').hidden = st === 'collect' || !S.hash; $('hash').textContent = 'Контрольная сумма списка: ' + (S.hash || '').slice(0, 12);
   $('btn-new').hidden = st !== 'done' || !!S.pending;
@@ -60,7 +62,7 @@ function collectTime() {
 function tickTimer() {
   if (S.stage !== 'collect') return;
   if (S.people.length && !S.collectStart) { S.collectStart = Date.now(); save(); }
-  $('btn-stop').textContent = 'Остановить набор ' + collectTime();
+  $('btn-stop').textContent = 'Закрыть набор ' + collectTime();
 }
 setInterval(tickTimer, 500);
 $('btn-stop').onclick = async () => {
@@ -106,11 +108,14 @@ $('btn-reset').onclick = () => { // двойное нажатие: обнуля�
   const b = $('btn-reset');
   if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.textContent = 'Точно сбросить?'; resetT = setTimeout(() => { b.dataset.sure = ''; b.textContent = 'Сброс'; }, 3000); return; }
   clearTimeout(resetT); b.dataset.sure = ''; b.textContent = 'Сброс';
-  Log.add(S, 'сброс победителей', 'было победителей: ' + S.winners.length);
-  S.winners = []; newRound(); save(); render();
+  S.winners = []; S.log = []; S.lastRound = null; // сброс обнуляет победителей и журнал
+  Log.add(S, 'сброс', 'победители и журнал обнулены'); newRound(); save(); render();
 };
 $('btn-download').onclick = async () => { if (!S.people.length) await JoinSync.pull(true); Export.download(S); };
 $('btn-admin').onclick = () => { $('admin').hidden = !$('admin').hidden; };
+$('btn-open').onclick = async () => { // вернуть набор: участники снова могут записываться
+  await JoinSync.ctl('open'); S.stage = 'collect'; S.hash = null; S.collectStart = Date.now(); Log.add(S, 'набор открыт снова', 'участников: ' + S.people.length); save(); render(); tickTimer();
+};
 $('btn-new').onclick = () => { S.stage = 'closed'; save(); render(); };
 
 function startDraw() {
