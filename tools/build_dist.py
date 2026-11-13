@@ -19,7 +19,7 @@ domain = sys.argv[1].lower().replace("https://", "").replace("http://", "").stri
 base = "https://" + domain
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 dist = os.path.join(root, "dist")
-skip_dirs = {".git", "dist", "tools", "extras", "node_modules", "__pycache__"}
+skip_dirs = {".git", "dist", "tools", "extras", "node_modules", "__pycache__", "_rz", "_gate"}
 skip_files = {".gitattributes", ".gitignore", "start-preview.bat"}
 skip_ext = {".md", ".py", ".txt"}
 keep_txt = {"robots.txt", "security.txt", "llms.txt"}
@@ -101,3 +101,10 @@ for dp, dn, fn in os.walk(dist):
         s2 = _ref.sub(lambda m: f'{m.group(1)}="{m.group(2)}{m.group(3)}?v={_ver(m.group(3))}"', s)
         if s2 != s:
             open(p, "w", encoding="utf-8", newline="\n").write(s2)
+
+# Закрытая страница розыгрыша: копируется ПОСЛЕ всей обработки, как есть (без версий ?v=, canonical и т.п.).
+# Caddy эти папки напрямую не отдаёт (404), доступ только через _gate/gate.php.
+for _d in ("_gate", "_rz"):
+    _src = os.path.join(root, _d)
+    if os.path.isdir(_src):
+        shutil.copytree(_src, os.path.join(dist, _d))

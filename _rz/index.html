@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Розыгрыш</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">ИИ-Директор · Розыгрыш призов</div>
+  <div class="prize"><input id="prize" value="Промокод на скидку 99%" maxlength="60" aria-label="Приз"></div>
+  <div class="top-btns">
+    <button id="btn-admin" class="ghost icon" title="Меню админа" aria-label="Меню админа">⚙</button>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="list-wrap">
+    <div id="list" class="list" aria-label="Список участников"></div>
+    <div id="empty" class="empty">Участников пока нет</div>
+  </section>
+
+  <aside class="panel">
+    <div id="big" class="big-number" aria-hidden="true"></div>
+    <div id="form-box" class="box">
+      <h2>Новый участник</h2>
+      <form id="form" autocomplete="off">
+        <input id="name" placeholder="Имя" maxlength="30" required>
+        <input id="nick" placeholder="@ник Telegram" maxlength="33" required>
+        <div id="error" class="error" role="alert"></div>
+        <button id="btn-add" type="submit" class="primary">Добавить</button>
+      </form>
+    </div>
+
+    <div class="counter">Участников: <b id="count">0</b> / 60</div>
+
+    <div class="actions">
+      <button id="btn-stop" class="primary">Остановить набор</button>
+      <button id="btn-start" class="primary glow" hidden>Старт</button>
+      <div id="hash" class="muted hashline" hidden></div>
+      <button id="btn-new" class="ghost" hidden>Новый розыгрыш</button>
+    </div>
+
+    <div id="admin" class="box admin" hidden>
+      <button id="btn-random">Тест</button>
+      <button id="btn-download">Скачать</button>
+      <button id="btn-reset">Сброс</button>
+      <button id="btn-close">Закрыть розыгрыш</button>
+    </div>
+    <div class="box winners">
+      <h2>Прошлые победители</h2>
+      <ol id="winners"></ol>
+      <div id="no-winners" class="muted">Пока никого</div>
+    </div>
+
+  </aside>
+</main>
+
+
+<div id="winner" class="winner" hidden>
+  <div class="winner-card">
+    <div class="winner-label">Победитель</div>
+    <div id="w-num" class="w-num"></div>
+    <div id="w-name" class="w-name"></div>
+    <div id="w-nick" class="w-nick"></div>
+    <div class="winner-prize" id="w-prize"></div>
+    <div class="winner-actions">
+      <button id="btn-redo" class="ghost">Переиграть</button>
+      <button id="btn-ok" class="confirm">Подтвердить</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/storage.js"></script>
+<script src="js/participants.js"></script>
+<script src="js/rng.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/export.js"></script>
+<script src="js/draw.js"></script>
+<script src="js/state.js"></script>
+</body>
+</html>
