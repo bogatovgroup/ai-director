@@ -5,10 +5,6 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/join_lib.php';
 
-const RATE_JOIN_DIR = '/var/lib/aidir-private/ratelimit';
-const JOIN_PER_IP   = 8;          // записей с одного IP
-const JOIN_WINDOW   = 600;        // за 10 минут
-
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 header('X-Content-Type-Options: nosniff');
@@ -46,19 +42,6 @@ if ($name === '') { out(422, ['error' => 'Введите имя']); }
 if (mb_strlen($name) > 30 || !preg_match('/^[\p{L}\p{M}\s\'.\-]+$/u', $name)) { out(422, ['error' => 'Имя: только буквы, до 30 символов']); }
 if ($nick === '') { out(422, ['error' => 'Введите ник Telegram']); }
 if (!preg_match('/^[A-Za-z0-9_]{5,32}$/', $nick)) { out(422, ['error' => 'Ник: латиница, цифры, _ ; 5–32 символа']); }
-
-// ограничение частоты по IP
-$ip = filter_var((string)($_SERVER['REMOTE_ADDR'] ?? ''), FILTER_VALIDATE_IP) ?: '0.0.0.0';
-$rf = RATE_JOIN_DIR . '/join-' . hash('sha256', $ip);
-$fh = @fopen($rf, 'c+');
-if ($fh) {
-    flock($fh, LOCK_EX);
-    $hits = json_decode((string)stream_get_contents($fh), true);
-    $hits = is_array($hits) ? array_values(array_filter($hits, fn($t) => is_int($t) && time() - $t < JOIN_WINDOW)) : [];
-    if (count($hits) >= JOIN_PER_IP) { flock($fh, LOCK_UN); fclose($fh); out(429, ['error' => 'Слишком много попыток. Подождите несколько минут']); }
-    $hits[] = time();
-    ftruncate($fh, 0); rewind($fh); fwrite($fh, json_encode($hits)); flock($fh, LOCK_UN); fclose($fh);
-}
 
 $res = join_tx(function (array &$st) use ($name, $nick) {
     if (!$st['open']) { return ['code' => 409, 'error' => 'Набор участников закрыт']; }

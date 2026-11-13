@@ -3,6 +3,7 @@
   var form = $('jf'), err = $('err'), go = $('go');
   var list = $('list');
   for (var i = 1; i <= 60; i++) { var r = document.createElement('div'); r.className = 'row slot'; r.innerHTML = '<span class="n"></span><span class="nm"></span><span class="nk"></span>'; r.children[0].textContent = i; list.appendChild(r); }
+  var prevCount = null;
   function setPeople(ps) {
     $('cnt').textContent = ps.length;
     for (var k = 0; k < list.children.length; k++) {
@@ -10,6 +11,14 @@
       row.classList.toggle('slot', !p);
       row.children[1].textContent = p ? p.name : ''; row.children[2].textContent = p ? p.nick : '';
     }
+    if (prevCount !== null && ps.length > prevCount) { // новый участник: зелёная вспышка, как в админке
+      ps.slice(prevCount).forEach(function (_, i) {
+        var r = list.children[prevCount + i]; if (!r) return;
+        r.style.setProperty('--c', '#a6ff3d'); r.classList.add('flash');
+        setTimeout(function () { r.classList.remove('flash'); }, 1500);
+      });
+    }
+    prevCount = ps.length;
   }
   var lastKey = '', timer = null, joined = false;
   function applyLive(lv) {
