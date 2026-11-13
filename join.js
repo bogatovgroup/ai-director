@@ -5,6 +5,7 @@
   function setClosed(c) { show($('closed'), c); show(form, !c); }
   fetch('/join-api', { cache: 'no-store', credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (d) {
     if (d && d.open === false) setClosed(true);
+    if (d && typeof d.count === 'number') $('cnt').textContent = d.count;
   }).catch(function () {});
   form.addEventListener('submit', function (e) {
     e.preventDefault(); err.textContent = '';
@@ -23,6 +24,7 @@
           show(form, false); var m = $('done');
           m.textContent = 'Вы в списке участников! ' + (x.d.n ? 'Ваш номер: №' + x.d.n + '. ' : '') + 'Следите за эфиром.';
           show(m, true);
+          var c = parseInt($('cnt').textContent, 10) || 0; $('cnt').textContent = c + 1;
         } else {
           err.textContent = (x.d && x.d.error) || 'Не удалось отправить. Попробуйте ещё раз';
           if (x.s === 409 && x.d && /закрыт/.test(x.d.error || '')) setClosed(true);
