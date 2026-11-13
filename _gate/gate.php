@@ -14,6 +14,8 @@ const IDLE_SEC    = 3 * 3600;   // бездействие 3 часа закры�
 const MAX_FAILS   = 10;         // неверных попыток
 const LOCK_SEC    = 15 * 60;    // блокировка по IP на 15 минут
 
+require_once __DIR__ . '/join_lib.php';
+
 $docroot = dirname(__DIR__);                 // /var/www/ai-dir.ru
 const FILES_SUBDIR = '/_rz';                 // сами файлы страницы (напрямую Caddy их не отдаёт)
 
@@ -40,16 +42,6 @@ function client_ip(array $cfg): string {
     $h = $cfg['ip_header'] ?? '';                       // например HTTP_CF_CONNECTING_IP, только если сайт за Cloudflare
     $ip = ($h !== '' && !empty($_SERVER[$h])) ? (string)$_SERVER[$h] : (string)($_SERVER['REMOTE_ADDR'] ?? '');
     return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '0.0.0.0';
-}
-
-function same_origin(): bool {   // для POST: запрос должен идти с нашего же сайта
-    // Современные браузеры сообщают Sec-Fetch-Site. Origin при Referrer-Policy: no-referrer бывает "null", поэтому на него не опираемся.
-    $sfs = $_SERVER['HTTP_SEC_FETCH_SITE'] ?? '';
-    if ($sfs !== '') { return $sfs === 'same-origin' || $sfs === 'none'; }
-    $o = $_SERVER['HTTP_ORIGIN'] ?? '';
-    if ($o === '') { return true; }
-    $h = parse_url($o, PHP_URL_HOST);
-    return is_string($h) && hash_equals(strtolower((string)($_SERVER['HTTP_HOST'] ?? '')), strtolower($h . (($p = parse_url($o, PHP_URL_PORT)) ? ':' . $p : '')));
 }
 
 function sess_path(string $token): string { return SESS_DIR . '/' . hash('sha256', $token); }
@@ -155,6 +147,27 @@ if ($rest === '/__logout') {
     common_headers();
     http_response_code(204);
     exit;
+}
+// список участников, пришедших по публичной ссылке /join, и управление набором (только для админа)
+if ($rest === '/__list' || $rest === '/__ctl') {
+    if (!join_available()) { common_headers(); header('Content-Type: application/json; charset=utf-8'); http_response_code(503); echo '{"error":"join storage unavailable"}'; exit; }
+    common_headers(); header('Content-Type: application/json; charset=utf-8');
+    if ($rest === '/__list' && $method === 'GET') {
+        $st = join_tx(function (array &$st) { return ['open' => (bool)$st['open'], 'people' => $st['people']]; });
+        echo json_encode($st, JSON_UNESCAPED_UNICODE); exit;
+    }
+    if ($rest === '/__ctl' && $method === 'POST' && same_origin()) {
+        $in = json_decode((string)file_get_contents('php://input'), true);
+        $act = is_array($in) ? (string)($in['action'] ?? '') : '';
+        if (!in_array($act, ['open', 'close', 'reset'], true)) { http_response_code(400); echo '{"error":"bad action"}'; exit; }
+        join_tx(function (array &$st) use ($act) {
+            if ($act === 'close') { $st['open'] = false; }
+            if ($act === 'open') { $st['open'] = true; }
+            if ($act === 'reset') { $st = ['open' => true, 'people' => [], 'touched' => time()]; }
+        });
+        echo '{"ok":true}'; exit;
+    }
+    not_found();
 }
 if ($method !== 'GET' && $method !== 'HEAD') { not_found(); }
 if ($rest === '') { header('Location: ' . $prefix . '/', true, 301); common_headers(); exit; }

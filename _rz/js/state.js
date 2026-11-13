@@ -64,11 +64,36 @@ function tickTimer() {
 }
 setInterval(tickTimer, 500);
 $('btn-stop').onclick = async () => {
+  await JoinSync.ctl('close'); await JoinSync.pull();
   const dur = collectTime(); S.stage = 'closed'; S.hash = await Hash.of(S.people); Log.add(S, 'набор остановлен', 'участников: ' + S.people.length + ', длился набор ' + dur + ', сумма ' + (S.hash || '').slice(0, 12));
   save(); render();
 };
+// Участники, пришедшие по публичной ссылке /join: подтягиваем с сервера в список админа
+const JoinSync = {
+  async pull() {
+    if (S.stage !== 'collect') return;
+    try {
+      const r = await fetch(new URL('__list', location.href), { cache: 'no-store', credentials: 'same-origin' });
+      if (!r.ok) return;
+      const d = await r.json(); let added = 0;
+      for (const p of d.people || []) {
+        const raw = String(p.nick || '').replace(/^@+/, '');
+        if (S.people.length >= MAX) break;
+        if (Participants.validate(S, String(p.name || ''), raw)) continue; // дубль или ошибка: пропускаем
+        Participants.add(S, String(p.name), raw);
+        const me = S.people[S.people.length - 1]; Log.add(S, 'добавление по ссылке /join', '№' + me.n + ' ' + me.nick); added++;
+      }
+      if (added) { save(); render(); tickTimer(); }
+    } catch (e) { /* сеть или сервер недоступны: список админа остаётся как есть */ }
+  },
+  ctl(action) { // open / close / reset на сервере
+    return fetch(new URL('__ctl', location.href), { method: 'POST', credentials: 'same-origin', cache: 'no-store', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action }) }).catch(() => {});
+  }
+};
+setInterval(() => JoinSync.pull(), 3000);
 function newRound() { // исходное состояние: пустой список и поля ввода участников
   S.people = []; S.hash = null; S.pending = null; S.drawWinner = null; S.collectStart = null; S.stage = 'collect';
+  JoinSync.ctl('reset');
   $('error').textContent = ''; $('error').className = 'error'; $('form').reset();
 }
 let resetT;
@@ -138,7 +163,7 @@ $('btn-random').onclick = () => {
   for (let i = 0; i < cnt; i++) Participants.add(S, n[i % n.length] + (i >= 20 ? ' ' + (i + 1) : ''), 'user_test_' + (i + 1));
   Log.add(S, 'тест', 'участников: ' + cnt); save(); render();
 };
-render(); tickTimer();
+render(); tickTimer(); JoinSync.pull();
 if (S.pending && S.stage === 'done') { // обновили страницу до подтверждения: показываем победителя снова
   $('w-num').textContent = '№' + S.pending.n; $('w-name').textContent = S.pending.name; $('w-nick').textContent = S.pending.nick; $('w-prize').textContent = S.pending.prize;
   $('btn-redo').disabled = Participants.active(S).length < 1; $('winner').hidden = false;

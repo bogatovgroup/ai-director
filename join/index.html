@@ -1,0 +1,25 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#050008">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png"><link rel="icon" href="../favicon.ico" sizes="any"><link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<title>Участие в розыгрыше - AI-DIR</title><meta name="robots" content="noindex, nofollow">
+<link rel="preload" href="../fonts/inter-cyrillic.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="../fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../style.css"><link rel="stylesheet" href="../join.css"></head><body class="jn-body">
+<main class="jn">
+  <div class="jn-brand grad">ИИ-Директор · Розыгрыш призов</div>
+  <h1 class="jn-h">Участвуйте в розыгрыше</h1>
+  <p class="jn-sub">Впишите своё имя и ник в Telegram, чтобы попасть в список участников.</p>
+  <div id="closed" class="jn-msg jn-warn" hidden>Набор участников сейчас закрыт.</div>
+  <form id="jf" class="jn-card" autocomplete="off" novalidate>
+    <label class="jn-l" for="name">Имя</label>
+    <input id="name" name="name" placeholder="Например, Анна" maxlength="30" required>
+    <label class="jn-l" for="nick">Ник в Telegram</label>
+    <input id="nick" name="nick" placeholder="@username" maxlength="33" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+    <div class="jn-hp" aria-hidden="true"><label>Сайт <input id="website" name="website" tabindex="-1" autocomplete="off"></label></div>
+    <label class="jn-c"><input id="consent" type="checkbox" name="consent" required>
+      <span>Я даю <a href="../legal/consent.html" target="_blank" rel="noopener">согласие на обработку персональных данных</a> (имя и ник Telegram) для участия в розыгрыше призов на условиях <a href="../legal/promo-rules.html" target="_blank" rel="noopener">правил розыгрыша</a>; с <a href="../legal/privacy.html" target="_blank" rel="noopener">политикой конфиденциальности</a> ознакомлен(а).</span></label>
+    <div id="err" class="jn-err" role="alert"></div>
+    <button id="go" type="submit" class="btn">Участвовать</button>
+  </form>
+  <div id="done" class="jn-msg jn-ok" hidden></div>
+</main>
+<script src="../join.js"></script>
+</body></html>

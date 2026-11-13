@@ -124,3 +124,6 @@ button.confirm{background:linear-gradient(135deg,#34e27a,#12a150);box-shadow:0 0
 @media (max-width:760px){
   .box.xl{padding:8px}.box.xl h2{font-size:12px}.box.xl form input{font-size:14px;padding:9px 8px}.box.xl form button{font-size:13px;padding:9px 6px}
 }
+
+.join-hint{margin:0 0 min(1.4vh,12px);color:var(--ac-b);font-size:clamp(12px,1.9vh,20px)}.join-hint b{color:#fff}
+@media (max-width:760px){.join-hint{font-size:10px;margin-bottom:4px}}
