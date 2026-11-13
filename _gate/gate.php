@@ -42,9 +42,12 @@ function client_ip(array $cfg): string {
     return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '0.0.0.0';
 }
 
-function same_origin(): bool {   // для POST: Origin (если есть) должен совпадать с хостом
+function same_origin(): bool {   // для POST: запрос должен идти с нашего же сайта
+    // Современные браузеры сообщают Sec-Fetch-Site. Origin при Referrer-Policy: no-referrer бывает "null", поэтому на него не опираемся.
+    $sfs = $_SERVER['HTTP_SEC_FETCH_SITE'] ?? '';
+    if ($sfs !== '') { return $sfs === 'same-origin' || $sfs === 'none'; }
     $o = $_SERVER['HTTP_ORIGIN'] ?? '';
-    if ($o === '') { return ($_SERVER['HTTP_SEC_FETCH_SITE'] ?? 'same-origin') !== 'cross-site'; }
+    if ($o === '') { return true; }
     $h = parse_url($o, PHP_URL_HOST);
     return is_string($h) && hash_equals(strtolower((string)($_SERVER['HTTP_HOST'] ?? '')), strtolower($h . (($p = parse_url($o, PHP_URL_PORT)) ? ':' . $p : '')));
 }
@@ -95,6 +98,7 @@ $path = (string)parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH
 if (($_SERVER['RZ_MODE'] ?? '') === 'login') {
     common_headers();
     header("Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'");
+    header('Referrer-Policy: same-origin');
     $landing = (string)($cfg['landing'] ?? ($cfg['prefixes'][0] . '/'));
     if ($method === 'GET' || $method === 'HEAD') {
         if (session_valid()) { header('Location: ' . $landing, true, 303); exit; }
