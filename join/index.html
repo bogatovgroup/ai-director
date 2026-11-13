@@ -1,23 +1,42 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#050008">
-<link rel="icon" type="image/svg+xml" href="../favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png"><link rel="icon" href="../favicon.ico" sizes="any"><link rel="apple-touch-icon" href="../apple-touch-icon.png">
-<title>Участие в розыгрыше - AI-DIR</title><meta name="robots" content="noindex, nofollow">
-<link rel="preload" href="../fonts/inter-cyrillic.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="../fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../style.css"><link rel="stylesheet" href="../join.css"></head><body class="jn-body">
-<header class="jn-top"><div class="jn-brand">ИИ-Директор · Розыгрыш призов</div><div class="jn-prize">Промокод на скидку 99%</div></header>
-<main class="jn">
-  <div id="closed" class="jn-msg jn-warn" hidden>Набор участников сейчас закрыт.</div>
-  <form id="jf" class="jn-card" autocomplete="off" novalidate>
-    <h1 class="jn-h">Новый участник</h1>
-    <input id="name" name="name" placeholder="Имя" aria-label="Имя" maxlength="30" required>
-    <input id="nick" name="nick" placeholder="@ник Telegram" aria-label="Ник в Telegram" maxlength="33" autocapitalize="none" autocorrect="off" spellcheck="false" required>
-    <div class="jn-hp" aria-hidden="true"><label>Сайт <input id="website" name="website" tabindex="-1" autocomplete="off"></label></div>
-    <label class="jn-c"><input id="consent" type="checkbox" name="consent" required>
-      <span>Я даю <a href="../legal/consent.html" target="_blank" rel="noopener">согласие на обработку персональных данных</a> (имя и ник Telegram) для участия в розыгрыше призов на условиях <a href="../legal/promo-rules.html" target="_blank" rel="noopener">правил розыгрыша</a>; с <a href="../legal/privacy.html" target="_blank" rel="noopener">политикой конфиденциальности</a> ознакомлен(а).</span></label>
-    <div id="err" class="jn-err" role="alert"></div>
-    <button id="go" type="submit" class="btn">Добавить</button>
-  </form>
-  <div id="done" class="jn-msg jn-ok" hidden></div>
-  <div class="jn-count">Участников: <b id="cnt">0</b> / 60</div>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg"><link rel="icon" href="../favicon.ico" sizes="any"><link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<title>Участие в розыгрыше - AI-DIR</title>
+<link rel="stylesheet" href="../join.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">ИИ-Директор · Розыгрыш призов</div>
+  <div class="prize"><input id="prize" value="Промокод на скидку 99%" readonly aria-label="Приз"></div>
+</header>
+
+<main class="layout">
+  <section class="list-wrap">
+    <div id="list" class="list" aria-label="Места участников"></div>
+  </section>
+
+  <aside class="panel">
+    <div id="closed" class="jn-msg jn-warn" hidden>Набор участников сейчас закрыт.</div>
+    <div id="form-box" class="box xl">
+      <h2>Новый участник</h2>
+      <form id="jf" autocomplete="off" novalidate>
+        <input id="name" name="name" placeholder="Имя" maxlength="30" aria-label="Имя" required>
+        <input id="nick" name="nick" placeholder="@ник Telegram" maxlength="33" aria-label="Ник в Telegram" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+        <div class="jn-hp" aria-hidden="true"><label>Сайт <input id="website" name="website" tabindex="-1" autocomplete="off"></label></div>
+        <label class="jn-c"><input id="consent" type="checkbox" name="consent" required>
+          <span>Я даю <a href="../legal/consent.html" target="_blank" rel="noopener">согласие на обработку персональных данных</a> (имя и ник Telegram) для участия в розыгрыше призов на условиях <a href="../legal/promo-rules.html" target="_blank" rel="noopener">правил розыгрыша</a>; с <a href="../legal/privacy.html" target="_blank" rel="noopener">политикой конфиденциальности</a> ознакомлен(а).</span></label>
+        <div id="err" class="error" role="alert"></div>
+        <button id="go" type="submit" class="primary">Добавить</button>
+      </form>
+    </div>
+    <div id="done" class="jn-msg jn-ok" hidden></div>
+    <div class="counter">Участников: <b id="cnt">0</b> / 60</div>
+  </aside>
 </main>
 <script src="../join.js"></script>
-</body></html>
+</body>
+</html>
