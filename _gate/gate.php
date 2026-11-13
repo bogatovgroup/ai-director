@@ -159,8 +159,18 @@ if ($rest === '/__list' || $rest === '/__ctl') {
     if ($rest === '/__ctl' && $method === 'POST' && same_origin()) {
         $in = json_decode((string)file_get_contents('php://input'), true);
         $act = is_array($in) ? (string)($in['action'] ?? '') : '';
-        if (!in_array($act, ['open', 'close', 'reset'], true)) { http_response_code(400); echo '{"error":"bad action"}'; exit; }
-        join_tx(function (array &$st) use ($act) {
+        if (!in_array($act, ['open', 'close', 'reset', 'live'], true)) { http_response_code(400); echo '{"error":"bad action"}'; exit; }
+        $lv = null;
+        if ($act === 'live') {
+            $d = is_array($in['data'] ?? null) ? $in['data'] : [];
+            $ph = (string)($d['phase'] ?? 'idle');
+            if (!in_array($ph, ['idle', 'run', 'gold', 'win'], true)) { http_response_code(400); echo '{"error":"bad phase"}'; exit; }
+            $cl = (string)($d['color'] ?? '#ffd23d'); if (!preg_match('/^#[0-9a-fA-F]{6}$/', $cl)) { $cl = '#ffd23d'; }
+            $lv = ['phase' => $ph, 'n' => (int)($d['n'] ?? 0), 'name' => mb_substr((string)($d['name'] ?? ''), 0, 40), 'nick' => mb_substr((string)($d['nick'] ?? ''), 0, 40),
+                   'prize' => mb_substr((string)($d['prize'] ?? ''), 0, 80), 'color' => $cl, 'at' => time()];
+        }
+        join_tx(function (array &$st) use ($act, $lv) {
+            if ($act === 'live') { $st['live'] = $lv; }
             if ($act === 'close') { $st['open'] = false; }
             if ($act === 'open') { $st['open'] = true; }
             if ($act === 'reset') { $st = ['open' => true, 'people' => [], 'touched' => time()]; }

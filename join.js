@@ -3,16 +3,41 @@
   var form = $('jf'), err = $('err'), go = $('go');
   var list = $('list');
   for (var i = 1; i <= 60; i++) { var r = document.createElement('div'); r.className = 'row slot'; r.innerHTML = '<span class="n"></span><span class="nm"></span><span class="nk"></span>'; r.children[0].textContent = i; list.appendChild(r); }
-  function setCount(c) {
-    $('cnt').textContent = c;
-    for (var k = 0; k < list.children.length; k++) { var on = k < c; list.children[k].className = 'row' + (on ? '' : ' slot'); list.children[k].children[1].textContent = on ? 'Занято' : ''; }
+  function setPeople(ps) {
+    $('cnt').textContent = ps.length;
+    for (var k = 0; k < list.children.length; k++) {
+      var p = ps[k], row = list.children[k];
+      row.classList.toggle('slot', !p);
+      row.children[1].textContent = p ? p.name : ''; row.children[2].textContent = p ? p.nick : '';
+    }
+  }
+  var lastKey = '', timer = null, joined = false;
+  function applyLive(lv) {
+    var ph = (lv && lv.phase) || 'idle', key = ph + '|' + (lv && lv.n) + '|' + (lv && lv.color);
+    if (key === lastKey) return; lastKey = key;
+    var big = $('big'), rows = list.children, k;
+    for (k = 0; k < rows.length; k++) rows[k].classList.remove('flash', 'blink3', 'final');
+    var busy = ph !== 'idle';
+    $('form-box').hidden = busy || joined || $('closed').hidden === false;
+    $('big').hidden = !busy;
+    $('winner').hidden = ph !== 'win';
+    if (!busy) { big.classList.remove('on'); big.textContent = ''; return; }
+    var row = rows[lv.n - 1];
+    if (row) { row.style.setProperty('--c', lv.color); row.classList.add(ph === 'run' ? 'flash' : (ph === 'gold' ? 'blink3' : 'final')); }
+    big.textContent = lv.n; big.style.setProperty('--c', lv.color); big.classList.toggle('on', ph !== 'win');
+    if (ph === 'win') { $('w-num').textContent = '№' + lv.n; $('w-name').textContent = lv.name || ''; $('w-nick').textContent = lv.nick || ''; $('w-prize').textContent = lv.prize || ''; }
+  }
+  function pull() {
+    return fetch('/join-api', { cache: 'no-store', credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d && d.open === false) setClosed(true);
+      if (d && d.people) setPeople(d.people);
+      applyLive(d && d.live);
+      clearTimeout(timer); timer = setTimeout(pull, d && d.live && d.live.phase === 'run' ? 400 : 1500);
+    }).catch(function () { clearTimeout(timer); timer = setTimeout(pull, 3000); });
   }
   function show(el, on) { el.hidden = !on; }
   function setClosed(c) { show($('closed'), c); show($('form-box'), !c); }
-  fetch('/join-api', { cache: 'no-store', credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (d) {
-    if (d && d.open === false) setClosed(true);
-    if (d && typeof d.count === 'number') setCount(d.count);
-  }).catch(function () {});
+  pull();
   form.addEventListener('submit', function (e) {
     e.preventDefault(); err.textContent = '';
     var name = $('name').value.trim(), nick = $('nick').value.trim();
@@ -27,10 +52,10 @@
     }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d, s: r.status }; }); })
       .then(function (x) {
         if (x.ok && x.d.ok) {
-          show($('form-box'), false); var m = $('done');
+          joined = true; show($('form-box'), false); var m = $('done');
           m.textContent = 'Вы в списке участников! ' + (x.d.n ? 'Ваш номер: №' + x.d.n + '. ' : '') + 'Следите за эфиром.';
           show(m, true);
-          setCount((parseInt($('cnt').textContent, 10) || 0) + 1);
+          pull();
         } else {
           err.textContent = (x.d && x.d.error) || 'Не удалось отправить. Попробуйте ещё раз';
           if (x.s === 409 && x.d && /закрыт/.test(x.d.error || '')) setClosed(true);

@@ -86,12 +86,16 @@ const JoinSync = {
       if (added) { save(); render(); tickTimer(); }
     } catch (e) { /* сеть или сервер недоступны: список админа остаётся как есть */ }
   },
+  live(data) { // ход розыгрыша для публичной страницы /join
+    return fetch(new URL('__ctl', location.href), { method: 'POST', credentials: 'same-origin', cache: 'no-store', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'live', data }) }).catch(() => {});
+  },
   ctl(action) { // open / close / reset на сервере
     return fetch(new URL('__ctl', location.href), { method: 'POST', credentials: 'same-origin', cache: 'no-store', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action }) }).catch(() => {});
   }
 };
 setInterval(() => JoinSync.pull(), 3000);
 function newRound() { // исходное состояние: пустой список и поля ввода участников
+  if (S.people.length) S.lastRound = { people: S.people, hash: S.hash, at: Date.now() }; // чтобы «Скачать» отдавал список и после сброса
   S.people = []; S.hash = null; S.pending = null; S.drawWinner = null; S.collectStart = null; S.stage = 'collect';
   JoinSync.ctl('reset');
   $('error').textContent = ''; $('error').className = 'error'; $('form').reset();
@@ -122,10 +126,12 @@ function startDraw() {
     if (prev) prev.classList.remove('flash');
     const row = $('row' + p.n); row.style.setProperty('--c', c); row.classList.add('flash'); prev = row;
     big.textContent = p.n; big.style.setProperty('--c', c); big.classList.add('on'); Sound.tick(prog);
+    JoinSync.live({ phase: 'run', n: p.n, name: p.name, nick: p.nick, color: c });
   }, () => {
     if (prev) prev.classList.remove('flash');
     const row = $('row' + winner.n); row.style.setProperty('--c', '#ffd23d'); row.classList.add('blink3');
     big.textContent = winner.n; big.style.setProperty('--c', '#ffd23d'); Sound.droneStop(); Sound.gong();
+    JoinSync.live({ phase: 'gold', n: winner.n, name: winner.name, nick: winner.nick, color: '#ffd23d' });
     S.pending = { n: winner.n, name: winner.name, nick: winner.nick, prize: S.prize };
     winner.won = true; S.stage = 'done'; S.drawWinner = null; Log.add(S, 'остановка на победителе', '№' + winner.n + ' ' + winner.nick); save();
     setTimeout(() => {
@@ -133,6 +139,7 @@ function startDraw() {
       $('w-num').textContent = '№' + winner.n; $('w-name').textContent = winner.name; $('w-nick').textContent = winner.nick; $('w-prize').textContent = S.prize;
       $('btn-redo').disabled = Participants.active(S).length < 1;
       $('winner').hidden = false; Sound.fanfare(); render();
+      JoinSync.live({ phase: 'win', n: winner.n, name: winner.name, nick: winner.nick, prize: S.prize, color: '#ffd23d' });
       const wn = $('w-name'); wn.classList.remove('blink'); void wn.offsetWidth; wn.classList.add('blink');
       $('row' + winner.n) && $('row' + winner.n).classList.add('final');
     }, 2800);
@@ -149,7 +156,7 @@ $('btn-ok').onclick = () => { // победитель записывается �
 };
 $('btn-redo').onclick = () => { // победитель не на связи: исключаем и в список победителей не пишем
   if (S.pending) Log.add(S, 'переразыгрыш', 'исключён №' + S.pending.n + ' ' + S.pending.nick);
-  S.pending = null; S.stage = 'closed'; save(); $('winner').hidden = true; render(); startDraw();
+  S.pending = null; S.stage = 'closed'; save(); $('winner').hidden = true; render(); JoinSync.live({ phase: 'idle' }); startDraw();
 };
 $('btn-close').onclick = async () => { // сеанс уничтожается на сервере, дальше адрес отдаёт 404
   $('btn-close').disabled = true;

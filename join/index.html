@@ -20,6 +20,7 @@
   </section>
 
   <aside class="panel">
+    <div id="big" class="big-number" aria-hidden="true" hidden></div>
     <div id="closed" class="jn-msg jn-warn" hidden>Набор участников сейчас закрыт.</div>
     <div id="form-box" class="box xl">
       <h2>Новый участник</h2>
@@ -37,6 +38,15 @@
     <div class="counter">Участников: <b id="cnt">0</b> / 60</div>
   </aside>
 </main>
+<div id="winner" class="winner" hidden>
+  <div class="winner-card">
+    <div class="winner-label">Победитель</div>
+    <div id="w-num" class="w-num"></div>
+    <div id="w-name" class="w-name"></div>
+    <div id="w-nick" class="w-nick"></div>
+    <div class="winner-prize" id="w-prize"></div>
+  </div>
+</div>
 <script src="../join.js"></script>
 </body>
 </html>

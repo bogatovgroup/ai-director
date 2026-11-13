@@ -22,7 +22,9 @@ if (!join_available()) { out(503, ['error' => 'Сервис временно н�
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 if ($method === 'GET') {
-    $st = join_tx(function (array &$st) { return ['open' => (bool)$st['open'], 'full' => count($st['people']) >= JOIN_MAX, 'count' => count($st['people'])]; });
+    $st = join_tx(function (array &$st) { return ['open' => (bool)$st['open'], 'full' => count($st['people']) >= JOIN_MAX, 'count' => count($st['people']),
+        'live' => (isset($st['live']) && is_array($st['live']) && time() - (int)($st['live']['at'] ?? 0) < 900) ? $st['live'] : ['phase' => 'idle'],
+        'people' => array_map(fn($p) => ['n' => $p['n'], 'name' => $p['name'], 'nick' => $p['nick']], $st['people'])]; });
     out(200, $st);
 }
 if ($method !== 'POST') { out(405, ['error' => 'Метод не поддерживается']); }

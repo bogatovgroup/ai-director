@@ -25,7 +25,7 @@ const Export = {
   esc: s => String(s).replace(/[<>&"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, ''),
   col: i => String.fromCharCode(65 + i),
   sheet(rows, widths, boldRows) { // числа остаются числами, остальное строкой (не формулой)
-    const safe = v => /^[=+\-@\t\r]/.test(String(v)) ? "'" + v : v; // защита от формул Excel
+    const safe = v => /^[=+\-@\t\r]/.test(String(v)) && !/^@[A-Za-z0-9_]{5,32}$/.test(String(v)) ? "'" + v : v; // защита от формул Excel; обычный ник @user не трогаем
     const x = rows.map((r, ri) => '<row r="' + (ri + 1) + '">' + r.map((v, ci) => {
       const ref = this.col(ci) + (ri + 1), s = boldRows.includes(ri) ? ' s="1"' : '';
       if (typeof v === 'number') return '<c r="' + ref + '"' + s + '><v>' + v + '</v></c>';
@@ -34,10 +34,14 @@ const Export = {
     const cols = '<cols>' + widths.map((w, i) => '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>').join('') + '</cols>';
     return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' + cols + '<sheetData>' + x + '</sheetData></worksheet>';
   },
-  xlsx(state) {
+  xlsx(state0) {
     const d = t => new Date(t).toLocaleString('ru-RU');
+    // список пуст (после сброса/подтверждения): отдаём список прошлого набора
+    const old = !state0.people.length && state0.lastRound;
+    const state = old ? { ...state0, people: state0.lastRound.people, hash: state0.lastRound.hash } : state0;
     const people = [['Номер', 'Имя', 'Ник', 'Добавлен'], ...state.people.map(p => [p.n, p.name, p.nick, d(p.at)]),
-      [], ['Контрольная сумма списка (SHA-256)', state.hash || '']];
+      [], ['Контрольная сумма списка (SHA-256)', state.hash || ''],
+      ...(old ? [[], ['Список прошлого набора (текущий список пуст)', d(state0.lastRound.at)]] : [])];
     const winners = [['Номер', 'Имя', 'Ник', 'Приз', 'Время'], ...state.winners.map(w => [w.n, w.name, w.nick, w.prize, d(w.at)])];
     const log = [['Время', 'Событие', 'Детали'], ...(state.log || []).map(l => [d(l.t), l.ev, l.d])];
     const names = ['Участники', 'Победители', 'Журнал'];
