@@ -1,5 +1,5 @@
 const $ = id => document.getElementById(id);
-let S = Store.load() || { stage: 'collect', people: [], winners: [], prize: 'Промокод на скидку 99%' };
+let S = Store.load() || { stage: 'collect', people: [], winners: [], prize: 'ПОДАРОК' };
 if (S.stage === 'drawing') { // обновили страницу посреди розыгрыша: победитель уже выбран при «Старте», заново не выбираем
   const w = S.drawWinner && S.people.find(p => p.n === S.drawWinner && !p.won);
   if (w) { w.won = true; S.pending = { n: w.n, name: w.name, nick: w.nick, prize: S.prize }; S.stage = 'done'; Log.add(S, 'обновление страницы', 'розыгрыш не перезапущен, победитель сохранён: №' + w.n); }
